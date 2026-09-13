@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tempahan Diterima — Akademi ZZ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy: #1B2A44; --navy-soft: #2A3C5C; --brass: #B08D57; --brass-dark: #8f7043;
+    --paper: #F4EFE4; --paper-line: #ded5c0; --ink: #22242b; --ok: #3f6b4a; --muted: #8a8a86;
+  }
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: var(--paper); color: var(--ink); font-family: 'IBM Plex Sans', sans-serif;
+    line-height: 1.55; -webkit-font-smoothing: antialiased;
+  }
+  .wrap{ max-width: 560px; margin: 0 auto; padding: 60px 22px 80px; }
+  .file-tab{
+    display:inline-block; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.04em;
+    color: var(--brass-dark); background: #fff; border: 1px solid var(--paper-line); border-bottom: none;
+    padding: 6px 14px; border-radius: 4px 4px 0 0;
+  }
+  .file{ background: #fff; border: 1px solid var(--paper-line); border-radius: 0 8px 8px 8px; overflow: hidden; }
+  .content{ padding: 44px 34px 40px; text-align:center; }
+  .stamp{
+    width: 66px; height: 66px; margin: 0 auto 20px; border: 2.5px solid var(--ok); border-radius: 50%;
+    display:flex; align-items:center; justify-content:center; color: var(--ok); font-size: 30px;
+  }
+  h1{ font-family: 'Fraunces', serif; font-weight: 600; font-size: 25px; color: var(--navy); margin: 0 0 10px; }
+  .lead{ font-size: 15px; color: #4b4d57; max-width: 42ch; margin: 0 auto 26px; }
+  .detail-card{
+    text-align:left; background: var(--paper); border: 1px solid var(--paper-line); border-radius: 8px;
+    padding: 18px 20px; font-size: 14px; margin-bottom: 26px; display:none;
+  }
+  .detail-card.show{ display:block; }
+  .detail-card div{ margin-bottom: 6px; }
+  .detail-card div:last-child{ margin-bottom: 0; }
+  .detail-card b{ color: var(--navy); }
+  .next-steps{
+    text-align:left; border-top: 1px solid var(--paper-line); padding-top: 22px; margin-bottom: 26px;
+  }
+  .next-steps p.label{ font-size: 13px; color: var(--brass-dark); font-weight: 600; margin: 0 0 12px; }
+  .next-steps ol{ margin: 0; padding-left: 20px; font-size: 14px; color: #4b4d57; }
+  .next-steps li{ margin-bottom: 8px; }
+  .next-steps li:last-child{ margin-bottom: 0; }
+  .cta-caption{ font-size: 13.5px; color: var(--navy); font-weight: 500; margin: 0 0 10px; }
+  .wa-link{
+    display:inline-block; padding: 15px 24px; background: var(--brass); color: #fff; text-decoration: none;
+    border-radius: 7px; font-size: 14.5px; font-weight: 600; margin-bottom: 14px; max-width: 280px;
+    line-height: 1.35;
+  }
+  .back-link{ display:block; font-size: 13px; color: var(--muted); }
+  .back-link a{ color: var(--brass-dark); }
+  footer{ text-align:center; margin-top: 22px; font-size: 12.5px; color: var(--muted); }
+  footer a{ color: var(--brass-dark); }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="file-tab">BORANG · TEMPAHAN KELAS PERIBADI</div>
+  <div class="file">
+    <div class="content">
+      <div class="stamp">✓</div>
+      <h1>Tempahan Diterima</h1>
+      <p class="lead">Terima kasih<span id="parentGreet"></span>. Cikgu ZZ akan sahkan tempahan ini melalui WhatsApp dalam masa 24 jam.</p>
+
+      <div class="detail-card" id="detailCard"></div>
+
+      <div class="next-steps">
+        <p class="label">SETERUSNYA</p>
+        <ol>
+          <li>Cikgu ZZ / admin akan semak slot &amp; sahkan melalui WhatsApp.</li>
+          <li>Link Google Meet akan dihantar sebelum kelas pertama bermula.</li>
+        </ol>
+      </div>
+
+      <p class="cta-caption">Untuk pengesahan lebih pantas ;</p>
+      <a class="wa-link" id="waLink" href="https://wa.me/60142020400" target="_blank">KLIK SINI</a>
+      <span class="back-link"><a href="/">← Kembali ke borang</a></span>
+    </div>
+  </div>
+  <footer>
+    Sebarang masalah? WhatsApp <a href="https://wa.me/60142020400">014 2020 400</a>.
+  </footer>
+</div>
+
+<script>
+/* ============================================================
+   TRACKING — letak snippet Meta Pixel / Google Ads Conversion di sini
+   Ini adalah halaman PALING SESUAI untuk fire conversion event,
+   sebab ia hanya dimuatkan bila tempahan BERJAYA dihantar (bukan
+   setiap kali borang dibuka).
+
+   Contoh (gantikan dengan Pixel ID / Conversion ID sebenar):
+
+   fbq('track', 'Lead');
+   gtag('event', 'conversion', {'send_to': 'AW-XXXXXXX/XXXXXXXXX'});
+   ============================================================ */
+
+const params = new URLSearchParams(window.location.search);
+const parentName = params.get('parentName');
+const studentName = params.get('studentName');
+const tingkatan = params.get('tingkatan');
+const subjek = params.get('subjek');
+const jenisTempahan = params.get('jenisTempahan');
+const scheduleInfo = params.get('scheduleInfo');
+const jumlahHarga = params.get('jumlahHarga');
+
+if(studentName){
+  document.getElementById('parentGreet').textContent = ` — tempahan untuk ${studentName}`;
+
+  let html = `<div><b>Anak:</b> ${studentName}${tingkatan ? ' (' + tingkatan + ')' : ''}</div>`;
+  if(subjek) html += `<div><b>Subjek:</b> ${subjek}</div>`;
+  if(jenisTempahan) html += `<div><b>Jenis:</b> ${jenisTempahan}</div>`;
+  if(scheduleInfo) html += `<div><b>Jadual:</b> ${scheduleInfo}</div>`;
+  if(jumlahHarga) html += `<div><b>Jumlah:</b> RM${jumlahHarga}</div>`;
+
+  document.getElementById('detailCard').innerHTML = html;
+  document.getElementById('detailCard').classList.add('show');
+
+  // Bina ringkasan penuh untuk mesej WhatsApp — supaya Cikgu ZZ/admin
+  // terus nampak semua maklumat tanpa perlu buka Sheet dulu.
+  let waLines = [
+    `Assalamualaikum Cikgu ZZ, saya baru hantar tempahan kelas peribadi.`,
+    ``,
+    `Nama Ibu Bapa: ${parentName || '-'}`,
+    `Nama Anak: ${studentName}${tingkatan ? ' (' + tingkatan + ')' : ''}`,
+  ];
+  if(subjek) waLines.push(`Subjek: ${subjek}`);
+  if(jenisTempahan) waLines.push(`Jenis Tempahan: ${jenisTempahan}`);
+  if(scheduleInfo) waLines.push(`Jadual: ${scheduleInfo}`);
+  if(jumlahHarga) waLines.push(`Jumlah: RM${jumlahHarga}`);
+  waLines.push(``, `Sila sahkan tempahan ini. Terima kasih.`);
+
+  const waText = encodeURIComponent(waLines.join('\n'));
+  const waHref = `https://wa.me/60142020400?text=${waText}`;
+  document.getElementById('waLink').href = waHref;
+}
+</script>
+
+</body>
+</html>

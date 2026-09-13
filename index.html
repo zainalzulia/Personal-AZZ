@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tempahan Kelas Peribadi — Akademi ZZ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy: #1B2A44;
+    --navy-soft: #2A3C5C;
+    --brass: #B08D57;
+    --brass-dark: #8f7043;
+    --paper: #F4EFE4;
+    --paper-line: #ded5c0;
+    --ink: #22242b;
+    --ok: #3f6b4a;
+    --err: #9c3b3b;
+    --muted: #8a8a86;
+  }
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans', sans-serif;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap{ max-width: 640px; margin: 0 auto; padding: 48px 22px 80px; }
+  .file-tab{
+    display:inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px; letter-spacing: 0.04em;
+    color: var(--brass-dark);
+    background: #fff;
+    border: 1px solid var(--paper-line);
+    border-bottom: none;
+    padding: 6px 14px;
+    border-radius: 4px 4px 0 0;
+  }
+  .file{
+    background: #fff;
+    border: 1px solid var(--paper-line);
+    border-radius: 0 8px 8px 8px;
+    overflow: hidden;
+  }
+  header.head{ padding: 34px 34px 24px; border-bottom: 2px solid var(--navy); text-align:center; }
+  .avatar-circle{
+    width: 84px; height: 84px; border-radius: 50%; overflow:hidden;
+    margin: 0 auto 16px; border: 2.5px solid var(--brass);
+    box-shadow: 0 0 0 4px #fff, 0 1px 4px rgba(27,42,68,0.12);
+  }
+  .avatar-circle img{ width:100%; height:100%; object-fit: cover; display:block; }
+  .meet-badge{
+    display:inline-flex; align-items:center; gap: 7px; padding: 6px 13px 6px 9px;
+    background: var(--paper); border: 1px solid var(--paper-line); border-radius: 20px;
+    margin-bottom: 16px;
+  }
+  .meet-badge svg{ flex-shrink: 0; }
+  .meet-badge span{ font-size: 12.5px; color: var(--navy); font-weight: 500; }
+  .meet-badge .g-blue{ color:#4285F4; } .meet-badge .g-red{ color:#EA4335; }
+  .meet-badge .g-yellow{ color:#FBBC05; } .meet-badge .g-green{ color:#34A853; }
+  .no-fail{ font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+  h1{ font-family: 'Fraunces', serif; font-weight: 600; font-size: 29px; line-height: 1.18; color: var(--navy); margin: 0 0 10px; }
+  .sub{ font-size: 15px; color: #4b4d57; max-width: 48ch; margin: 0 auto; }
+  form{ padding: 6px 34px 34px; }
+  .section{ padding: 26px 0; border-bottom: 1px solid var(--paper-line); }
+  .section:last-of-type{ border-bottom: none; }
+  .section-label{ font-size: 13px; color: var(--brass-dark); font-weight: 600; margin: 0 0 4px; }
+  .section-note{ font-size: 13px; color: var(--muted); margin: 0 0 16px; }
+  .field{ margin-bottom: 16px; }
+  .field:last-child{ margin-bottom: 0; }
+  label{ display:block; font-size: 14px; font-weight: 500; color: var(--navy); margin-bottom: 6px; }
+  input[type=text], input[type=tel], input[type=date], select, textarea{
+    width: 100%; padding: 11px 13px; border: 1px solid #c9c2b0; border-radius: 6px;
+    background: #fdfcf9; font-family: 'IBM Plex Sans', sans-serif; font-size: 15px; color: var(--ink);
+  }
+  input:focus, select:focus, textarea:focus{ outline: 2px solid var(--brass); outline-offset: 1px; border-color: var(--brass); }
+  textarea{ resize: vertical; min-height: 76px; }
+
+  .plan-grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .plan-card{ position:relative; }
+  .plan-card input{ position:absolute; opacity:0; width:100%; height:100%; cursor:pointer; margin:0; }
+  .plan-card .box{
+    border: 1.5px solid #c9c2b0; border-radius: 9px; padding: 16px 15px; cursor:pointer;
+    transition: border-color .12s, background .12s;
+    height: 100%;
+  }
+  .plan-card input:checked + .box{ border-color: var(--navy); background: #fafaf7; box-shadow: inset 0 0 0 1px var(--navy); }
+  .plan-title{ font-family: 'Fraunces', serif; font-weight: 600; font-size: 17px; color: var(--navy); margin: 0 0 4px; }
+  .plan-badge{
+    display:inline-block; font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+    background: #1e8e3e; color:#fff; padding: 2px 8px; border-radius: 4px; margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .plan-desc{ font-size: 13px; color: #4b4d57; margin: 0; }
+
+  .radio-row{ display:flex; gap: 10px; flex-wrap: wrap; }
+  .radio-chip{ position: relative; }
+  .radio-chip input{ position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer; margin:0; }
+  .radio-chip span{
+    display:inline-flex; align-items:center; padding: 10px 16px; border: 1px solid #c9c2b0;
+    border-radius: 7px; background: #fdfcf9; font-size: 14px; color: var(--navy); cursor: pointer;
+    transition: border-color .12s, background .12s;
+  }
+  .radio-chip input:checked + span{ border-color: var(--navy); background: var(--navy); color: #fff; }
+  .radio-chip input:disabled + span{ opacity: .35; cursor: not-allowed; text-decoration: line-through; }
+
+  .slot-grid{ display:grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 12px; }
+  .slot-btn{
+    padding: 12px 10px; border: 1px solid #c9c2b0; border-radius: 7px; background: #fdfcf9;
+    font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--navy);
+    cursor: pointer; text-align:center; transition: border-color .12s, background .12s, color .12s;
+  }
+  .slot-btn:hover{ border-color: var(--brass); }
+  .slot-btn.selected{ background: var(--brass); border-color: var(--brass); color: #fff; }
+  .slot-btn.full{
+    background: #efece4; color: var(--muted); border-color: #ded5c0;
+    cursor: not-allowed; text-decoration: line-through;
+  }
+  .slot-btn.full:hover{ border-color: #ded5c0; }
+  .slot-empty{ font-size: 13px; color: var(--muted); font-style: italic; margin-top: 10px; }
+  .hint{ font-size: 12.5px; color: var(--muted); margin-top: 6px; }
+
+  .class-block{ border: 1px solid var(--paper-line); border-radius: 8px; padding: 16px; margin-top: 14px; background: #fdfcf9; }
+  .class-block-head{ display:flex; justify-content: space-between; align-items:center; margin-bottom: 12px; }
+  .class-block-head b{ font-size: 13.5px; color: var(--navy); }
+  .remove-link{ font-size: 12.5px; color: var(--err); cursor:pointer; background:none; border:none; padding:0; text-decoration: underline; }
+  .add-link{
+    display:inline-block; margin-top: 14px; font-size: 13.5px; color: var(--brass-dark);
+    cursor:pointer; background:none; border: none; padding: 0; text-decoration: underline; font-family: inherit;
+  }
+
+  .start-date-note{
+    margin-top: 12px; padding: 11px 13px; background: var(--paper); border: 1px solid var(--paper-line);
+    border-radius: 6px; font-size: 13.5px; color: var(--navy);
+  }
+  .price-note{
+    margin-top: 14px; padding: 14px 16px; background: var(--paper);
+    border: 1px solid var(--paper-line); border-radius: 7px;
+  }
+  .price-note .pn-title{ font-family: 'Fraunces', serif; font-weight: 600; font-size: 15px; color: var(--navy); margin: 0 0 6px; }
+  .price-note .pn-line{ font-size: 13.5px; color: #4b4d57; margin: 0 0 3px; }
+  .price-note .pn-line:last-child{ margin-bottom: 0; }
+  .price-note .pn-line b{ color: var(--navy); }
+  .price-note .pn-empty{ font-size: 13px; color: var(--muted); font-style: italic; }
+  .price-note .pn-badge{
+    display:inline-block; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px;
+    background: #1e8e3e; color:#fff; padding: 1px 7px; border-radius: 4px; font-weight: 600;
+  }
+  .price-note .pn-hint{ font-size: 12.5px; color: var(--brass-dark); margin: 6px 0 0; }
+
+  .submit-row{ padding-top: 6px; }
+  button.submit{
+    width: 100%; padding: 15px; background: var(--navy); color: #fff; border: none; border-radius: 7px;
+    font-size: 15px; font-weight: 600; font-family: 'IBM Plex Sans', sans-serif; cursor: pointer;
+    transition: background .12s;
+  }
+  button.submit:hover{ background: var(--navy-soft); }
+  button.submit:disabled{ background: #9aa0ad; cursor: default; }
+  .msg{ margin-top: 14px; font-size: 13.5px; padding: 11px 13px; border-radius: 6px; display:none; }
+  .msg.show{ display:block; }
+  .msg.err{ background: #fbeceb; color: var(--err); border: 1px solid #eecdca; }
+
+  footer{ text-align:center; margin-top: 22px; font-size: 12.5px; color: var(--muted); }
+  footer a{ color: var(--brass-dark); }
+  @media (max-width: 480px){
+    header.head, form{ padding-left: 22px; padding-right: 22px; }
+    .plan-grid{ grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="file-tab">BORANG · TEMPAHAN KELAS PERIBADI</div>
+  <div class="file">
+
+    <header class="head">
+      <h1>Tempah Slot Kelas Online 1-to-1 bersama Cikgu ZZ</h1>
+      <div class="avatar-circle"><img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAgAAAQABAAD/wAARCAGkAaQDACIAAREBAhEB/9sAQwAIBgYHBgUIBwcHCQkICgwUDQwLCwwZEhMPFB0aHx4dGhwcICQuJyAiLCMcHCg3KSwwMTQ0NB8nOT04MjwuMzQy/9sAQwEJCQkMCwwYDQ0YMiEcITIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIy/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMAAAERAhEAPwDhqKXFNI+Ws7GIlJS0UAJSEUuKKAGYoxTqCKAGU3FPxQRQCGUhpSKMUihtIRT6KAIwKQ1Lj5aYRQA2onqfbUbLQBCKBUoSgCkBAU31XktkfNXWFMxS2H1MiWyb+Gqro0f3q3yKglt1datMq5kRStH91q0IdS3/ACSr+NVp7Rk+7TY7OaT5VWnoCVzYhkSSdNjZzj+dd4Rs8tf9kVx2jaBNGyTSsBjnFdeZFespGiVh5FOSmg04GoGTxj5hWxs+X8KxVfDJ8vetdZ12j5aQIfSGlDxP93tR/nFAyM03FSkU0igCBlpmKnZaZigogKU0irBWoitAEZ7V514i/wCQxN9a9IK15x4h/wCQ1P8AWrgRMyMUYqQrTAK0MwxRS0lAwoopcUAJRS4pMUAfcFFFFaiCiiigD5IzRnNPFIRUWMNCPbRinUmKQDaM0+mkUWASiiloGhKYafTTQUkNxQRS0UgIyKMU8UmaBBimkU6gigBuKaUp2KM0DGbKbinkUHhaAGFaZsqbFNJUfebpSsNERSoiFemz3aD/AOtVVrl3+6tMdiaRGK1f0420S7rhsViv5p+beR9KtW9k08G79834UWKTOhOpRBdqMMfrTk1VPN+bniudewuI/wCCTHuO1PR7cSbZd6+/aoauVc6qDU7e5basyx/79X7eZH/jDc4rjSsqf9NEPQnjj61Ys55o22p/9ahoLneWg3yJtwea2mT5fmUc+1cJZ6x5Uibt/GMntXd2l1FewIyvngc1DRSKxi/uVGZXj+WVeP1q+yqG+X/61QFFOd3zZ/KkWIBnDL3oxUBDwN/sVYT5/moAjam1MRTcYoAh20wipmpqigEQYrzTXTv1i4+teoFP4a8v1k/8Ta4+tXBESKGKTbTloqyCMikxUuKQigBmKbUlNFFwG4oApxFGKYH27RRRWogooooA+TcUjfdpwpSKnc5yCinladiiwXIqKeVpPloAZRTiFpKQ07AFppFLRSHcaRTSKcaKAuRgUYp+KaRRYLiUlKKDRYBBQVpc/wD1qQsoX5mpFJXG4qKU4+lMuLxLf39Kyp755P4sU0h2sPur5921Wqk0zv8Aec1GxzUZOVppFJFj5U+bdUbXbVXIpQKqwywl7N/dqzHreoxR+Uj7RVBDinn51pWBF5df1P7u8njv0obVbh/9bChrKPyNS73/AAosM37S9QsFV8oeoft7CtlLZLiP/R5ea4xTswy1v6TqPkN833KmwjoLFFknFu7D/gfH5VbW7u/D92PN3/YH/rWfNeW14u+Fh5imtzT7ttQsHttQQSdt3cCosUmdVbXaXkCTW7BoyOc/yp4T+6tcXoN+mlXs+lTS/u/vxseRge9dJFr+mTrt+1wGTvzjn86hqxaZekhyv1qGH+76VLDM1wv7loG/3GyaSWLy275I59KQxaaVpy//AK6dSGQFflpgGKkP3qQ0ARn+QJryrVfn1S6b/bNerP8A6p/oa8ovx/p8/wDvmtIESK6CkIqUfdplUQNFLRigLQAgWmlalxSEUARUGnkUwigD7aooorYQUUUUAfJ4FIDTgKQCpRz9BpopSKXFMQ3FNIpxpKQDdtGKdRQMjpKUUUhoSkNLigilYBtNBp+KQJQAmKQin4xUZdQp+agpIjd8fd61l3t39njO775/HFSXV6sanb1rFcebJvZqC0iF3lkbdzSjNTnatMZ1qihRGxUt2FV92ytseSPDzt/y0Z8fpmsEnfRYEPPNMBozRmqAeGoVvmplANDQI1ILdLnf8vaoJbbZ+HWi1uWjap47lT52/mpAhCfKPSrkIQrVKeVfLG2mxXFAI1Btg+5Vu1vZS23e/wA1Y0tznFSwTbP4qmwzoboIJ4dwDep74ra+16HJbCJ9PhD8fMgwa4Z7lvM+9T/tjBvwoaGnY64L9kZ7jR754h/zyf7jH3rc0zxat7i0uIntbvI3Kf8AVufb0rhbDXvs/wAky+ZH6dq0J/J1GBHspdsn8A/55n29azaHc9PiOWO1PTdnp9QacR/P865fwrr82oMdM1D93fR/dkPHmD0NdOx+X5uMnik0WnciIprLU3y7frQVqGOxAfuv9DXkt+f9Pn/3z/OvW5+LaZv9k15DcHfczN/tH+dXAiQzNNxT8UVZmIBRSkUAUDExRiloxQA3FIRUlNoEfadFFFbAFFFFAHyiaQU5jSUjmGmnUlFADSKSnU0ikNBSUtJQAzFG2n0UrAMIpKc4pKBjaM06myDyoy1ItDZfkXezfJmsTUdTz8kP8sUmoXrP92spFaVqew0gzn5mpwK1L9mRP46gcLu+9TLGvLUDU6QfNTHppATPO32ZIu2c/jVenKu/5V5q9aaTcXGNqfoaTko7lRhJvQz8VKltLJ91DXcaR4LaTDvXU2nhKEfex+Vc88VBaHTDCt7nkhsJv7tBsJh/DXuCeErQr8yA1Wu/CUSRvsiFZrFpmjwltjxJonRtu2mjdur0m+8Hs+9tn8+KyH8KPEv/AOutViIMxlh5J6HHMzbdtIDiuml8PSnotZNzpksTbdtaKpFkOlJGeXzUkUlNe3dPvLUf3KvRmbTRM03zUCWoCaUU7CJ/Nbd97itbTtV+zMjNxgjHHNYnzBqlL5WpauB6PcR/aVi1WJ9si46cfnXUadqq6vafe/eJw3bn2rzTQNYeS2/s+ZuOx6V2OlH+yL9N3+rfGe/NZyRcWdUI3jwrVMRhfrTxKjxihhlfvVkzVMpXZ/0Sf/cOa8hEiSTyfN/Ea9gvQwsLv/ri38q8DZ2iuZCufvH+daU1cykboFBrPttSx8sy1oJLFKvyf/Xq7ECGgU/FG2kA2lopaAG0lONJRYD7RooorYQUUUUAfKRFNNPWkYUW0MOg2igUAVKEFGKWimISkxTqKYEe2lAp1IRSKiNNJTiKQrn5fekNoaOFLN+FYOq3z7tlamp3i2ke1flNcwm+/nd2akXBBBE8sm7/AOvVmU21tHsXmT9KQSNFA8US1RlDFttFixks7Gq5djU/ks9ROMVSQJA8m9fpSwxPO21aIIWnk2rXfeGvDeNk0q1nUqRgjalRc5EXh7wo86iWVeOK77TtBit1+70FX7GJIINqr+laKKz15NStKbPUhSjAghgVF2rVqGD5v/rVagss/NV+K0x/DWXKy3LsUlgqZLVT9+r4g/2ackVWoGfNqZb2EJ/hqs+jW0md0Nb5h/2aYYMVXKxNnKP4ctjn5etY9/4St0V9sW7iu/lg/wBn8aqSQf4UKUkx6NHh+qeFbgMdkPFc7d6FLA3zLX0FPp0MqurL+lc1qXheGTOFrohiGtzJ4dSVzw+SwZG+9UbxLHj5w1eoXPhry8/LniuW1fwzKN8sVdUK8ZaM554eSV0c559tt2tbkn61A4if7ilKbJG0bbHpqmuhanI007MniZk/jrtdF1lLuw8m4f8Aer9361xCvVmCVo23r6ipaC57Vod59r00LK37xPvfWtZDmuI8JX/ms/zcnGR712CrL97cef0rnkrM2T0DUyiabcN/0xb+VeHy2iuz/jXtOsFhot4zN0iP8q8hxvy1XDRGczIktHj/AIaiV3jb5eK3dtQS2ivWilci5FBqX8MtaCSxSLuRh9O9Y0tm0dQo8sTblaiyGdBj/PpQBWfBqin5Zvzq+kqS/wCqbtU2AMUGnkf3utIKYH2bRRRWogooooA+VdlIwp5ppps50xgWlApcUYpCG4oIp2KRhQA2ilxRQA3FJTqTFIaExSPuC/LS5+aquoXf2eCT6UnsaI5zWbpnn2bs81Vik8pQq/xVXkffI8rUiHe21aRaWhcLrJ8qf/XpxjWOmuiR/d+/TSrmPc1AyCWX+FagRGkbbUjJ81bXh7SGvb0L0TiiUlGNyoRcpWNjwl4deVvNdTivT7PTViVE9qdpGkpaWyL04H41tRRbGH0ryK1RyZ69KKhEZbWKD+Gr0VtT4lq9DF8tTCNxuQyCPH8NXUioiiWraha3jBGTkQeVSiGrIK04Gr5ERzFXyqaYquUzatPlQ+ZlR4MrVZ4K0ytQSI1S4oakZckH+cVRngzn5e3pW0yNVeVOtZOJpF6nNT2iFfu9eKwb/TkP3Vx6+9dlcQ1l3VtlT9azaad0bxaejPIvEvhtZIzcW/yyL1XFcIysGKt1Fe839phXf/gJ9xXlPi3RP7Pu/Oi5hk/PPpXoYatfRnDiqKWqRzVTRuwqKnRmuxnnm1o2pS2F2ku44yOOnFeyaXqdtqFgk0XD45FeFRnDV6b4QnYQQfOFB/GsZK+pSZ0mun/iQXbesZrydR8v4V6t4nLx+Grr5vvY/WvLFGF2+wqYbBIbj9KMVIBRiqIsRFKgltUkq2RTdtNAY81myVGkrwN6VuMMrVeS0SRaaYEUGpr/AMtfzq+kiSfMjVkS2TJ92oUaWJv4h/Khq4H3XRRRWgBRRRQB8rmkp5FJiqscyY2gCnmmA4pWAMU00E0UgCigUpoAjoNLQfu0rFRIicfWsDXZWEe3d1rdf+833O/1rlNcm8y72r2pGkVcy3ChRToto+ZqZI2WpoOflosaF+ErI29+gp4dpctt+SqobKhK0Nnl2m1e9JgVY0UyD9K9S8F6T+7R2TtXndlb5u469i8LHFtGtc2IlpY68PG+p00EP8hVgLQhWpcV5p3W6j4hV+LtVOI1ciraBDRaT5KmWq4p6tWyZk0TmgUzdRup3ESZoBqINT91FxhvprGgmo3anoNICVqvIFod6iZ6mxSuirKmazLpPlrWkNZl21ZNG0b3OfvE/vetch4nsVudHkVuZEziu1uec1h36fuCrVMHyyTRpKPNFpnhxRgxXvQvDbq1tctPs2qP/cJqj5FevCV43PDqK02iWNMrur0HwgPN02X5vnQjHrXDWUW/5K63wVcpFczxN1k/oKl6oSOr1+T/AIpWRXbnj+dedgZr0XxdF5Xh5F/vbf5153n5frURVhyClAop1MgaRSEU+igCPFBFSUzFADSrf3ary26yfwVbxRii7A+y6KKK2AKKKKAPlqkpaSrOUKGooNCAjxTgKMUCpsMAKMUtJmhoCPFIRTj92oXkx978PWpuVEr3b+XAWbpj9a4meXzJHdutdD4hu8WwhC8t+dcvSNIoM0lFFWaEsR+atJH31kofmq3E7VDBbm/pgzc7q9V8ND9wleX6BE0tyn19K9b0S08qAfSvOxM+h6WGh7tzbQ1cX7tUs/pU0Rd221xrU6NkXUNXIh8tRQxiNdzsPzqzBPC/yq2a6IIxb0JFNOAqVQv5e1SqlapEXIAaCasGLNMMNPlFcjQZp2ynLGwpdrUWYyJqhkGaskVE4osOJQcNuppq0VqKRKRomU5A22sy5rYesu7FZtmkXqYcx61kXpUr9a1LvjPvWBev/wDWrPrc3vpY4jxJab8y+hrl45c/LXoGqR+baOvsf5GvOZY2t59u6vQoSurM8nFQSd0aFpJsuY2rR0S68rX4/m25b+tYUclSRT+Vewyr13Ct2jlR7F4tk3+Gk+fOWH5CvPAF21015qbXvhVFLfOj/p61zVRsJsMUuKcBRigQlJtp22jZQA3FLS7KSgQmKMUtKtA0fY1FFFbAFFFFAHy1mkBWlJTd/d/A0pLbf/rVZzDaKdSUrCEooxRRYAAppHy04UGgZXP3dtUZ5YopDNcOAB90c5zVm4do/maUcVzGpXLTyPubIHSsnuXFXM7ULpru5kdufT6VUpW+9TapGqVkFFFFUMUVYg3O22q4Na2h232i9RPpUTdk2XBXaR3HgzTMtG9eoQRrH8q9hisXw3paW1t93sK3SNleNVlzSPYh7sLIGlRGpiaokTbvSnfZ/MjfdmsWe2TzCiMCPr3pQTFpYt3niLzG9fZKrxeLGjysUW31rOk0pw29VLZrLvdL1CCMuls/866YIlpJHbWnjVUX96w/MCtqy8YWVw23eM14TdwagG/fW86J7R44qsi30e9opXHp2Na7GLV9j6ci1KF1+Vh+dWVuYn+61fNmm+JtRtPv3L/ia7LSviHKkaLcdP71JuwezuexCRf71KGWuGsPE0V2u7fW3aal5tJTQ/ZNG6VWmlFqgb3FPF+tHNFk8skTvEtQyRfLUwuYnX/69IZ4v8mnpYabRlzxMmf8Kw70/NXTzMj5+ase9tlK8elZSia05anH3s2PyrnriXe1busQNHn6VzUrdaySszr0tcgu9ptn+hrzrUl/f16Deyqlofoa8+vxvneu3DnmYtq5VRvlppbNIOKQmuyxw9DrLLUGlsI4dw+dAPxBp2P0rnLCUpOnzcV0yBNu771ZtWEOUfLSgUuKKkQmKKWikIKjAqSimMQCgLT6B/SgaPsCiiitgCiiigD5Bt9BWJf9IuJJJPqcZ9K1La1W3Xvj3asG31fVNQk+zwtbR98uBzV+KHVPvS3sJf8Au+UT/SlFmFjVG2n4rMP9oxfxRzfRcVKmoqny3ELxHj3rS5LRbIpMUiOrrvTlOx9aWmkIMUEfyoprUFJFSQeZlNtc9qtqkEfzL+PaumceWpZiAQPzrj9bu2lk27/8Kya1NIIyGNMopVC01oahSU4j+7TkT5vmobAEVv4q9A8A6Ms8/wBol6Vxthpmo6rciLT7KefP/PNCf1Fe5+BfAuuQaaguLb7Nn/nr1/AVhX5nGyN6DinqbsEawW3y9AOe1ZGpeJdB0b/kMX11v/hgthnj3zXe2vg+GOP/AEy5kkA5IHyj8TVHxXomg3PhyZ0s7W5dcIsq4Zlycda5KeFe7OmeIj8MThE8V3XiHzE8JeGHlgTreX0mMfhTotG8YvnztU0m17+XHFu/Kuj0y0h0+y+z20XlwjG4ds+tMv8AU7ewid244pzlFPRDgmZ0GneKY8P/AG/p0h9Htv8A69WTqnimz/1v9hX6f3QwjY/Qeted674nvry5fbNN5PZY8j865LUb+52jcn3u7GiGo56Hs03iyI5XU9A8n1aKUMP0rltYTT7vMti0i5554P415pFq93G23zn/AJir9treox7JWfdH33pkYrb2fmZQqdGi5c22xvlfd6+lQCWXb+P4V0NobbVbYO8JiJ/iTIX8qnGhPB+9aHzrT+8nOBWUtDph3G+HTcPOFVzXqulo0FoGasPwxodpJbfaLZvNT1xyD6Gujngmt4D8mI16nNc7ve5q5LYr3uoeXWDe+KFt/ut2o1W52Kf0rz/U7mV5yyL/AFojdspRSR1b+ObiNd1Z8/xJuY2+WuLkNzJ95OP1pqac87fdP5Gt46HPUTvodpZ/Eu4nb50rfsvHcUq7XWvLRYSxfdi/mDSIJk+98laWTMVJo9O1DW7S8Xbu5rnZ1xJuVvkrlRczI3dq0LO/3yBHUispU+ptCq3oxmry4X865CfljXS+ICqLurlZHytdNBWRyYl6lYj5qSiiuo5RVHzfjXU6YW+zfhWJpMYludrDNdJEuF2rxWUhMcKUCjFKKkQYoxTgKcFoAi20VLijbSER05R/SnbKdGi7vxH86Y0fXVFFFbDCiiigD4jn07VtP2XEsWNvcYOK2tOutZuYC0Nyjf3o8AVQg0i8vI/3OrQyJ/dL/wBDU9tp2s6WxaHY361Gxk9TWFzqkTf6RbRyJ/0z4NSC/tpPluIZIX/2+RVCLXpopP8ATrEr/tDjn1rRiu7S/j2rKG/U1aZBajKGP91ynb0oJWq7WjR/8e8pB/uv1/CiOeaRtksXl47+taJi3LFRyypF7ntUhGz/AGvf0rn9V1iK2bbEwZx+dS3YqCHaperFG7y5WQ9vSuOmlaWTc3NSXt5LeT75WNQAZ+apNkrDo4/MY0JHmpLZ2TpRGG5+bvUtlW1sOCLtp4Vf4k3JREnzVLPA+0MrUr6j5XY9a8G/GrT9D02DT7jw6kaR8eZa4H5g8k16ro/xQ8M6vGjLdmAv/DcDb+tfK+nWm+7iVkZs4r1/TtAt5LaFNmfXf2+lZVK3KdFKhzntkxt9X0ueK3uA0c0ZTdE2cZGMivI9Z8Iah4Q03T9MstRvJrO4uzLczf0Iq3DZXOkfPp93PGB68r+VXNWur7VdCe71S7nijsMTf6NAD5mOoPNJV4zVg+ryjLyLbFDAdjHgD/8AXWXc6Nb3PzzSlvb0ptjeLqFtDe282YJu46fT2NXkHVdj/wA/xzXBNOMmdqSSVjnpbK0tPl8lMepGaivbDQ9Rtts1lAcf3ODXUTWMVxHteI4Nc/f+DFl+aG4kizRGbWxqlFrU4+TwboMknyJPH/wMYp83hS2lsPsy3YiCdM8n2zWofAl9uP8AxMZilXbLwNNuHnPJJ/L8a19rLuSqcDI8L6A9ldvaXEyT27DhhnrXqOmaTFaWwVeR78jHoRVfTfDcNmu9uqdPSjX/ABDFoflW65aWT+50AqHK8tRTaWiOa1m61PQPHNrbeGbY3X2ld09qv3Pf6eua9LEMlxpaTX0MdpJty6bgwX1Ga8lttWuH1SfXNOm828OYRB/eJ9PQV07X3iRLTdcafHubqvUfjWvNHsZ+zm7NHN6/4n8NXcssSapHC0ec7oj1HYVztjo+oaxbfbrS3dbUk/vZCEVvfHXFbsWm6X4kv763vtLhiuJI22NHHhw4GRj6n86u2UaSabbw/OI7dAg38HjOQR2707RtcqTnF2Zzo0n7H/rdQhjkHoNxp9tqMUVzsivVlf8A65ADNUtfnvpbk21sj+T/AHkTA/Oucv7a5sFR5n2/TrTikzGUpI9Khvb77zLp0v8A10wDUU6tPJ5t9oi+Q3/LS1IP5V5Mb2X+GZ2/OtTTfEGo2DJsmfy/7r8itHEzU7y1Nm/tbKK5n8l54h1AmXIx+FUIY/MbduDYI+bOBj6da3mv/wC0LTerZfHK9vxrGcvZ6tBstoy/5g/UVK10Lfu6mf4kbfaBlYf1/KuSJ+WvT9Z0SW4nt/8AhJrP+ybe6/49r6GL5dx+6G54GcZ9K4nxR4U1HwpqC2mobPnG+OWPlJAe4PeumnCyOWrK7ujERcttWgj5qmtx8xamRo886JEuXY4GPWtL6GRqaIv+k7q3xzS/8I9c6HZQNfJsknGQvtSR1k9yWO2U4LS0UWC4AUYpRRSEGKMUUUCExT4R+/T3I/nTakg/18f1H86Brc+tqKKK2KCiiigD47n8JxD/AI9rh4n7A9fzqukOvafv2t5iD8a2LTWFdRFcW72sv03A1poFK/eDe4oUbmHMc9ba79o/c6habvw71Yn0aKf/AEixl8mT06VqpBEjFto/SpNq/wB39KpQFcwYNTvrJvs+ooWT/nqP55rZSRJFDo24du/50+aCKddr8/yqk9k1u2+H7g7DpTSsK9yW7L/ZJGXsp6V53Nul8yX/AGvwr0dZfNjKt9DXM6lok0TGa0/eJ/zy7flUyNYWscuDVhJUFs6bPnqeW0c/8ujxn26VWa3eNTvR/wCVSXe5NZp5ny1YktfKqjau8cm5a6mGwuLyw+0be4rKo7K50UIqUrMXTtGaW283ZVe7iRG2t2/n6V6RBb2+kaLC748xkHBrzvV7ltQvwsMSL1+4MGuanVcpM7qlFKN0J4chafWkr2rSlwo+b0rybwtA8eqbWXpXrOnN+7H61jiHqOgrI6FIVkj9cDp2pn+kWm+KLY0UilXifkc+30qS1k+X8BV4DfWUNNUN2ejOHi0F9HkluNDfyt5Pm2MvzQTeuO4NaFprOk7kiuM6ddfxQXP+rz7OeMfjW1LCUbcvrn2zVC7gtryMxX1tHcx/3XAP/wBetHMaV9jVijV41liCypj/AFsbbk/A9KY8sSNtlZVP+8K5f/hFbG3k87TNU1HTJP7sMmU/75ORVyF/ENtBt/tXTtQ9Pt9sVb8wRml7rJakjdUw/e4/Q1ObuGP06c8gCsW11DU/u6jb6Tj/AKd8jj2yauf2ppEcHzpz9M0WXcd32JLrUVCllUnjjGCK5nX7O7u9Oe+ltE+zpjzTIcN5Z4yD2Oa2LzxVpllD50Wnedx97OBn6VnQNq3jfyxfRQWmkqwbyYzkyEdj7VcUu5LvvaxB8PvDlpHvvobd47fcTF5vJPuK9CuUXy/up/hS21sltBHCgARAAAOAAKkkHy1ZHO20cDcw2+meMLG5PyRvLhvTJHH61R+w29pq2oW/+sxcN34GecfXmtbxtZyz6eZoYt0kOHHrkHNU5Lc6jpdvr2nw585B9rCcsGAwTj14o3Rq3qmzPmkezUqqDH90jtWNd3el6gphmtEMnP3+D+FdSAsse5ud3TPUD39657U/DyXLFkUxv+X41gpNM2jGMlqcffeGrHz90NvPH+ORWVfaVNH8yL8ldPPo2s2jf6O/mR+9RJp+oXLbJm24/KtY1e5nOjC+hj+HDKJ5Ipf/AK1dtoGlRXvjWwXaGTv3GKyY9HW3bczjf/sdK3tCttTOqJcWkJYR45Trj0FaU53ldHPWg1HU9F+J2iQ6v4GntPlRwyCNsfdJIX+teA/FLwnd+Gb/AE23uNWm1DzLYbfN/wCWeOMD24r2LxTrGoWWhPc7J5rv5fJsiO/Yn15rxX4meJL7X9ft31C38ie3t1XyuynGT+tdsXc4WrHGyNiPaq16t8OfAEMmnJrGopud/mhi9h3rz/wto0uu61Db/wAG4FvpmvpK3ghtrRIYvuRqE/L0qW7CsebfEVv+JxAu7gRjj0rklX5a6nx+f+Kj/wCACuaWpRLAUtAFGKZIUUYoUUAFFP20zFFgFqayTfdwr/tj+dQ4qzp3/H/B/vj+dIcdz6vooorYYUUUUAfLYTKldpx6HBFCjZ8qrj6Vl2urW8rfJK/+7JgHPsBWmJUk427X/u96uDRztakmaN1NzhtrKcmnAVYgpAcUu2jFAhCf7qj8qhaNX+bbU5WkC0mrjRWe2WRv7tQ3FokkZR8t2+laGKCMr+NTyopNo87v7GXTrk7kOxuhrrvAOpwyXqafc/xMNvp9Kv3VpDdxlJV3ZFc5BpFxo2tQXdvvaFHH1wTjFY1YXizooVHGSPQvHaNaSQxKv8FcbpGl77l7l36dPTNereJ9I/tzTbS5h2M6qOvBzis7TtIsbS2+yX2FnP3cfdzXkwlytnu6ShqcnoNs41SaWX/Irv7Z12pt/GuZ0y0ZL+dnxnJ+50wOldJCG429qmpK7uCSUbHQ2RzW3Avy1ztnKorZt7j5acGjCa10NHyon+8tVJdMt3bdtqVZlpk12qLW3u21IXMmZVzo6bSyfKfrWfLaPbR/LMfx5q1fa0kS7d3UVxOr+Jd6lEbnmsZcvQ6qcXLct3900bFFl3H86jsNF1DUZNyPtFY1k9xJ++K56e9epeHHj+wIz4BwM1MEm7Gs/wB3G6Ma28E/vxLcTPIf0/KursrNbZQiKNmOO1XfPtx3qtLf28fzbq6IwUdbnFKrOppY0Eh6USotZseroflWll1FAvvWqnCxh7OdzJ159in9R2Nec6bqt7oWpS/YZtsMjEmN+V59q7LW777Q21T7VzGo+Hmkg+0RZ3iudzs9DvhGLjaSNtbu3vIPORfKnbn5OFJ+lVG1eygbyb6XyHzxkcMfasmwLBQr54H6+1bBe3u7b7Pe26TJ/wBNF5/A1k3dl8iWiLZtllj3RYKeqEH9AapXOnKFLKhz64xmoToOnp81k9zaP6xSnFMMF9bfd1ydv+ukYb9aPmTZmZLZNHL8zg/7mTj6133g6VLOMdW3dWcbQAOprzq9m1uP54tZT/vwB/SsnyNQvWP9oazczJz8qZQZ/Cuii1HW5zVoSkdnrnxR0608Q3N/uhvLeyHlQwD75f1z35rwXV9Tm1vWrrUZv9ZcyF8fUnium8U2Fvpmi2kNvEnzuWaR+XP4+lZvgvQbjWPENrEo/do4L/SvQjK55s42dmem/CTQFstLm1aZPnn+5n09a9DRF8sr+fvzTIbdYII4UVVQfwjgD6VJn9eKhu4JHlHjznxQf9wfzrn1FdB45P8AxVEnsgrn1pozZIKCKBS4pkibaAKXFAoAWkxS0UwI2q5pESyataq2eXFVGrT8PRNJrVoq/wB4UrDR9R0UUVqMKKKKAPiLS59PDH+0fM9inDVr/a4Uw2n6jNGT/wAs5oT/ADrnJmaX975u7b7AcfSuj0jWLu4tBD9ijlRP+meT+dQjNouRa3NEwXUbf/dniOR+NbFuyXMfmo4I/wBg5BrNd7a5j8q5t2iT/YGBmsoW934fk+028v2mxb72zsPf0rWLsZtXOpH8qXH8VRQTxXkaXFow8tgD5fcVNn5a0EJS0UUAJTabThQFwBX+LPNA+TH1FGKsabGkupQRO3yFhms5r3WawspI7q1+0QLburfuyo3A1eu7eHUF3rbjfGPvVrjSkeOPpgKPam3Pk2VpJ846V4c17zPchLRI4W2i2Tv9SDWtAKpQLvnf69q0VXC/UVkzfQkil2N9avRXOP8A9dYM0uz8KIp3l+73qbhyo35dTVFPT86wtT1/y967ugqKfdtLegrjNf1BomddvWtItvQqMI2uO1PxHK8mxeXP9at6Ho8142+4Ws/QdCluJUu7v2xXqGlWSp930FacppzpRIdP0aIQbNh/LisfX7u+8PqZYfmh/wBiu3EexfwqreWUV3bFHizkYpxg97GSq3ep4rc/EfW5W2W7hU9+DUdt451vzx9obKcV21/4C0/zHmaLa/pXG6zokNmz7MjFa+7a1hKSvsdxpviHzLQSv6etMvPE2F+Vq84hvbmO22RKSBVC5vb2XO2so0rvctzha7R6Pa+I4ZbsK+Otdxb31pcWm1cV80mSaOTd5xR/rXW6Jr93BbBGmMj1pKhyq9yY1IzlY9AuQv28rExxWzaQLcLXKWP2i5X7Q7HNdDpk7RSD61g13NZK2xqtpbbfvdqyb7S7hPm3Guttp960y5KPH9afKrGCk0zzS7t5RlWzVQDy2+90zmur1WAPv21yd2PLYr7GlHexq3eJz/jdc2Vgo7k/zrvvhvpNtp+i+bt/fv3p2m6Hb6ppcL3EKS7enrnFdLpVkun2iRbcbK9Gm/dPHrJc7L4/3qX/ABpAf1pQK0MTyPxe3meKrv8A2VFY6itTxT8/iq+b0xWYtUloZMKBS0UJEhRRSiiwCAUYp4oosAwJ81bXhdP+J/afU1kitrwoM+IbX8aOhUT6VooorQAooooA+GJ7mK42KtuI3XuvH51f8PXl3Bevb21wkW4E4k7+1bF3ollqlt9psv3b+iVgos2l3f71Cceo461nEzvodlFeSv8AJe2xj/6adqZc2j7ZPsTYjdTlR0NSafew6nH8q7pMfdPT8KeytAu9OfVe2K1i7md2mcjYy32l3sjopXZkmJ+AR9K7K0uUvLZJU6H8s9xVW+tIdTtN6cTfwt/F9D7VneGZXinm064+WUE7e1NOwPU6IimGnv8AJ8vc8fSm1oSNxS4paKBhQCw+5w4II9aKKGrqw09bnQ2vjXVYLbytvmkd361xet+P9UvdSS2dRHiQe3Ga0kXNcl4jstl3Hd/7YHtjNcc8PHV2O6lidVE9hsG3wQt7Dp34rVI3x/hWDpMv+iW/+4v8q34Dn8q8ias2esruKZg6mWjUtzU2gHz1+b8Ks6la+av1pumQfZvl9f0qI7lX0L91bbIz8vavOb22+06w+9coD/WvTbmRTH+GK8/v4ng1Lft4JrWC1BOyOm0pLeOMb1HA49q6e0uYhGNnf0FeajX7aCTZM4XArSTxjpdpAn+kI30//XWqTZMnfQ9JiR5V+6eacbd923yn9q4a3+Kmkwrt+ZzxV2P4p2Mn8O3/AH+K1TSWpm4T6HR3NpLJE+1D+I5rz3xTpF2fkVOtdBL8SLLvs/OpofE+k6owVmAeok03oa04TS1Rw+neHrmK0dZYuv8AKqdz4dYZ/dY9a9Wiks3/AOWydPUVVu9Phl/1TJUp2G49zxW78Nb8tsqXSNG+wXIZlr0O/sHi3/KDzWTLAv8ASr9o7WHCmlK5atJcr6U2W9W3nH1qkXaP5v8AJqC5n89d3pWDVzdNPQ6u11PzF+Vqum9/d/N/OuMsLvy4927POKtz6llfvdqlpkuCuXr25/velczeHez7evapbnUMfebtVG3n+0Xcaf32A/Orpx1IqySjY9N8NW32fQoN38fX3Na+KS2hW3sIbf8AuAH9Kdiu+Ksjxpu8riYoXt9cUtIB0+uatEs8W15t/iO+b/bP5CqYqxrB3+Ib5v8ApqahUVpExYAUYoFLTRIgFOxQKKAClxSUtAhcVteEU3+I4PxrFJwtdB4JGfEcP0P8ql7FxPo6iiitACiiigD4y8P3/kSfZ2+43fvmujutOS7g8qbZ/vd64VVaOTevbFd5ZTrLYRv3xz9aiCuYNnLSRXOh3e5T8mf0rq7G6W9gSVfxqtqdkt3bbf41FZWg3L29z9ndqpO0rBujauA9tmaH7mfmrP1ODzI49Rt/9ZH971I65rZI8zKevSs6IywTvbS/Mj5A+lW99CS9aXa3lskyOT/SpcVmadavp88kScxv1rS3f59KuOwMWinUlUIQUtFBpAho/rWN4liaTTTL/c5rZFVr+Hz4JIm6YNTLZlx0aZv+HrtZ9LtH3fwD+WK6y2f/AGu1eaeEp9mm+UzcoSP14rtLO6yo2tz3rwa6amz6CjK8EdDhT78VXc4akSb5fwqCadawRrYmefZWDqqee3y1PczO/wB30qlArSz/ADetaxdncaWhzN74YluW++PnNcvrfhq+0aRDL+8jb7p617XDZIV+7kkelS3OlRX9obe4hRht7jnOa6adS2hLimeO+GbK3vI9rD59wzXf6l4KWeO32Z7dOBU9x8PIpW87T3+yyK4bA6OBWj4hv9cj1LTLeysmFqm3zW9cdaJ+9qhrmitDntZ8CSwWSNb7t/FYsvhrULCPzecj8K9dv/EenI1tbsu2RyO2RmmanaQyrsZc59sisXoONafVHjkF3qwb5N+Pxq5YeLbu2kMT+YSPrXp/9iW/2YbU/TBFcdfeHId08sS4680J3NPbJ7ojtvHEU/yTf/XpZdUt7ltyNj2ri7vSvIiluU4Az9c1zaarcRSffNbwpX1IlXilsej3V4n3N1Nyv2b71cRFqzytt3V0loXlWNd1J0+Vamcat3oalgu9XX34ps48utSytPKtizVm3/Gawe50qWhk3MrBau+FEW78R2kW3o2/24rJnf5vwrqvhxaNca7Lctt2QoeO+TXTTicWIloz1WTu3p2plKT8v1pK6lseYNNAH86DQPvBvc/yoQ5bHiOo86xft/02NRJT7451a+ZennN/OmRirjsYNhS4paBVE3EApcUooAoQxAadRsoosID92up8DIH19G9FP8q5Y11/w+XOrTN6Rj9TUvYqL1se/wBFFFaDCiiigD4p1G2WO7l2dK3PDku+08r+7WXp9xb38kv2jflicHpx71Z065h065kRmyj9Kyg7SsYPax0eK5vVU+yX4mh/iNdKpSRdynrWTrdtvjD9MfyraUdLomOmhqW0nmQI3sKr3yY2TL99D+lGmFf7PTa2cYqw679+7nirirpAGd6hl6MM0URR+XHt7Dp7UCrtYCSkzQKMUAApT92koJoECiklGF3UA0SH5f6UWvoNvsYmhXTRXt5bcddw/Outtrv5k2+nNYEdnEl28qLtP86njnaNiv5V5OIguc9jCzfIjtILxnUfSkmlzWFZ3rfdrVQ+ZXA42Z3qV0SJtf5f61ZgtdjblWq9ui+Z92uisolP8NNahzWQ6xHy/NVor/eqX7Psyy9qUJvWtErE8ybK4DW7b1brVyO9hk+W7TZ6Z71XK4Xbt7VTlZdu5W/rWkZ2L3Na48NaRqqhumznKcGsy/8AA/mSI9vqt3FtHAzkVV/t1bf5N2zjr0pV8USj7sqSJ9eatuL3J5Kiej0HroHiG0U+TrPmp6Sx1zN3oPieOCeJ7hG8zP3P88V1X/CX4XHFYmo+Lblm+Tp/SptE0hCTeqOAudB15NJOnzPCNzk57/ia59vCNxHPtlkVvdOld0dR8xnZ89agM/mfKvrzWiqW2Lnh4vc5mLw1FGo2fNJXTaDp7RN++TpV+KzUR7m61Fc3bW/3Fz6e9Zzm2Y+yUdUaN7dJFG+1q5C9v/MY0X+pXEnyt8vFYxdj956UIDvoSl9/+ea9F8FaponhjQPO1G+2312/yxRLvk9uB0Fed2VrNqd/BY2y7ppD+Q6Zr1zw38P9P8N4uLj/AEvUW+9Mcny89h6V0wRwV5dDo4J/Pgjm2uocZ/eDGR9KkFOxj/ax6+nsKYP5mtjkFpj/AHX+h/kacDTXP7uRvRD/ACNAPY8Nuf8Aj7uP+u7UR01233M7espP6mpIxVxVzFhS0gFLTJAU5fvU2gH5qAJaQ0UCmFxpPy12fw9H+m3TekY/ma4/bXafDxPmvm9gKmSsVFa3PdqKKKsYUUUUAfFPh6+hgkNu6D5/4j1qWeBbvVNqMg2jI3nAPt9axLafyJNzLU9xLvk3K3071lb3iGtTtbHUYpGS2eIWswHfp7Y9c1PqcHmWDrXBPPcT7N0p+Xo3v6V0Wja1KLbZcv5ie/Wtee+hPJrc0tEb/iXIr8GtLd8xqC2gSOD5PuHkfSptvX8q2jsZvccTUdONNqmA4GlBptGaQCk02lJpKBBmlH86aDSg0Lcomt08yd/pVG9TZ+fpWpYf6x/wpt7b71+b3rysQ/fPXwsL0zKtrxg33q6CxvN6/NXKun2eWrFpfsjVhKKZ1Q0R29tL826uhsLhN33u3FcLaXyuu1mrfsLrDJ/nNYpWZo9UdzGfPX6ilWBkaqVper8i1sRuv+FarVGWyKzW+fxrPvdMYxv5Q7da3BzU8UalaahcFUaPLdQ0W9n3rs4xXNz6He2mXWV69zn0+KT+HtWTc6BFIr7eKfIbRr3PFhbXqfe8yhPO53MelenXHhmX+Fvk/nWDd+HWRj8n0qHdG8KischtrQsbb5tzVpjRPL+Zk/Wpo7VY1+lFxSloVbm58tttY97eIM7vTjitS9eKPLbu1clqF55rff8A/r1SV2YynZFWSRp59ztxUE8qRew/X8KhNz1Val0/Tvt83m3MvkWg4aXG/n/dzW8IHLOtY9A8AabqelxvrH/CNzXkkgxBL56oqj3H1rr5vEesxq//ABSE5dvvGO5D1yGl/Di7vLJGtvF32m04KwQkjP1GeK7/AEWKG3tjYxQyRXcGA8byHLe+e9bnDOdzi28Yam/j6G0l0e5tozF80GQW6ZzXeWlz9pg81YZF/wCunBz6D1rg2/f/ABy/64Wwz19MV1viPxRpnhqy83ULjdK3+qt4+WJ9x2pkXNQlUyz/ACp3Z+Ao9zVCa+t5bS8+zTCcJGfmj5GSDXBSvqHieP8AtPX77+xPDv3ktt37yYfTqKgvPHlt9im0bwrpJjs1Qjzed31J+lAX0OYBx97+LP8APrUyNiqlvHKjbnbO786sAVcXYxbdyQGlFNpRTAWgfeooFICSgCkzSiqQhymu6+HS/wChXTe/9a4X+H616D8Pk/4k8jermlM0ie0UUUVQBRRRQB8LxG3jYedF5qf3ehqxqFraIqTWLu0R+8r4yD6VnxSNx/FW8mmRanYebaP/AKWPvw9Mj1FZvQl6ajNH0m21C2fdcPHN/drQ/wCEY+41tcZf+JX4FZujG407VESVfX/CuzUf59auCuQ3YyNBmljkl067/wBYv3P/AK1bCnPzVmanaS/aYLu3++vWtMnp7gZreOhDdxxNNzRSUyRc0ZpKKBXFpD92gGglT96gNhtKhpMLtLbsAdaybnXba0Z1/wBZ/jUOVi4Js6nS033Lt9KvXMHynd+FZXg+7/tC2ebYUQk4/Cugnj3/AJV4+In77PfwsbQscle2lYsiPFJ9K7C5gWsO7tqUJaDnFrYpW180bfe71uwav5ext3auTnjZPzpqXjx43fcq+RPUSm1oz1rTNUWVY23V19tdq8aV4hpWueRLtl/1fH4V29lraHY0Tfu+9RyuJV01Y9JiuFNTm58r8a4W31nzJPkatOHW0PyyyjP1oUx+zOoF9mh5/lrmzqqu3y05r13X6e9UpkezsbM9zsXk1lNLFIx3OKppc3FzlKY5it/9a4yOtKTuaxVkRXrLuKKvWsK5l8tnXj86ZqutZudkLd657U9TWON9zcmpUG2W5pRsU9Y1H5nWuXluVOfmPem3l758/wBc1Joljb3t3A+p3BttP37Xl9R3H1IrphBI4alXXQj02yuNTu44lR/s5cK0uQBjPPtXpNl8Ht7XVxFrdzHbrn7MsQB8zAyMnp1qv4yfS9PgtNB0TS7zypHR/kUfvPTHFWbK28a26p/YOl3VikXLNezhU/XgVskcc5XMfwF4YtNY/taxvbi9tNVtHPlypKV49x65rZn8Na/oUkl3DrN1HPAmUluCPLkTuDk9T2rn/CfidNC8c32o6/cQyPNGVb7OwcM+Seo965nxV4u1HxBqlw1xezNaZPlwOflx9B0quUzN6y8dzWXii+1+Xy3vnt/KUJ0z03VmW1xqmsat9shtp9R1eTndj5U/pkVyYk/4D6cHp/hW3o083mRw/bru2D/xQt/KiwHaxfD3xpqd/He65p73UH3jF54U+/Ga9Ct9MtNL8K3/ANn0M6e/kEN5nz7uOoNedmyhN/HaRePb6zklGQL5H4Pu2cVoXnhbxfb6PdtceJ3u7REz/ozF9w9+eBQBzEe75N/U5/ziniqENvchf+P3t/HGQatQo/8AE/mVUdyCxSikFLTEOopq06gAp/8AhTFp5qhjgMrXpfgiLy9A3f8ATQ15nn7/ANK9X8LJs8PW6+2amRoj1OiiiqJCiiigD4KDeW23vWjp99LaTh4lyf6VUvEaO5kRlxzUSOwqWri3R1Nzd25kSV2/eDBrodPu4b+23xSjf6d682dmdtzVJa3txaNuilK/ypw0J5Lo9KlXeo3ZUUKcfIrZwPzrmtK8SsW+z3K7s9Grod6/d3f/AF63UkzFpokzRmmE/wB6mM6imRzE26k3VBmgP/DQBMTTXbC/hzTN3+1VXUp2itJNvtSbsmVHVozL/U3eIxI2PWuWkZ5Z/m55/CtOZ99s7d+9O8LWC3+v28Uv+rDAt+Fc7lo2zshBcySPWfDGnLZaBa2zOFfaGPrzzWrLF/D6frR9mSRfl4AwB9O1PjRkXa1ePUlebZ7dONopGNcxZrKubaulnirKuIc0k7Mu1zlbi2X+7WTdWv8AF2FdTdQ/w1lTxY+WuiEzGpT7HOOXjatLTtbmtmjRn/d+lE0Cjf8ALWXLFittJIws4s7K21x3bcvTNX0uGkbzfN/WvPBK8f8AEatQak6fLuNZOjc1jVfU9PtdXQN8/wDOr7+JbeKOvK01Vz/Gae9/vX7/AOtJU2i3ViehnxsyKVhrEvdcuJFLsx+auPOoeX92qst+zt8zcdqtU2Q6ysdA2s+U29s76w73VpblnbfWfLdO7f8A16gBzW0YJI5Z1Lkod5G2r1P8ya9mtvBv2vwjDp82zfHbiaFcfx9eT3zXlfh+w+26xaW64+eRRnt1Byfyr6OvoltLL5cb4l/NQOcVZhJ2PL4vGmnv4o0x9Yi8r+z4/LfZ6jgfyqx4j8W3fj7WIfDPh65MFm/+vnlkK7uec1wmp2k2p+KLiy09BK9zLhRx39T6Vo6RoNy/2u3t4f8AT7HLXEAkwZk9j7YoRhcv+IPDunQeN9J8LaOv+r2i6mTnzTnLNnuMVmeOvCkuheLH0myXdDeFfJL+/v25zVjwLqMNl4sk1i4srqTT4/kabl/s+fU98VZ+J+tpr2vx3mjM9zpunoim5RT94nPWrGVfEt3LZ/2To+s6ZBDeaa6r8ijE0RI6nvxXW+KfhrbS20GueEF8mTyw72yHj3256VV8c6ZpeqfD/TdZa+j/ALRWBf8AXSDzJR0xgdx710/w/wBavtV8K2CRaPNIIAY/taTDt0yueaBnnml65qA0uZNZ0n+19JRtssRH722Yf7X3q3bh9PuPCdxcaDrAmRFH+iSSeW0eegA74rrte8NTfa/7b0NUg1NRtli/5Z3I7qy/3q5HV9F0u88OXWqadbJYXakJdWjj/Vv6j2qQORtrlXXa7EycDD1ZD/7VZypKPlfa3T5uhqxEP9qrRky3upQajBp4NMRItLmmA07NNIaFFSE1F/Sn5+an0AdjKla9f0JNmhWn+4K8iQfMPqK9k0wbNJtF9EFQ3oXBnotFFFWAUUUUAfDGsRvHqEu5Rk+nIqgKtXt01ywZl5FQ2qNJJtVN3+FJPQBuaawqxchN21F21A56UJ6AmLG+xq6vRNWY/wCjzNn/AGq5Qx4+apIpHT5l60J2ZMo3R6BLOwY/xVAL5U+/VDTbt7iH96nIp83OfmFXzmPJZlxbqF/uyj+VDn5d+/8AWssx26LvZjmq63byNsX7lHMVGmi7PetA33s1Tu795Y9rd8fzqrOfmqPdmpcjRRSGxn76t3rc8GxraaoXbr2/Ouek3I1aml3XkXKPu6HmsaifK0jpotKSbParaTMfy9SPwqcJmue0bVEnjT3rpoh+73eteNNNOzPZi7q4x7dZFrOn03rW6sO9ahlt2pbbDTscbd2D7vu1lz2ldzPB8tYl3bKP4auM2itzjbmDGaxrmBq7O6tl5asO7tW5rohMyqU7nMyRVGEb2raewzUUljha6FM53TaRj5ams9WZYsNULJWiaMWncgL0wmpSlAjzVKxDTI1FTRJT0ixVqBFLUc2glG+4qPLaWz3ETmOROQR1z7V6J4b8e3Go+GrqLUNYhtJIICn7xctLxjj3xXnGovssHVfX9KqaNPbRXLrc2/mo6lV7YOOKa1RjU0djoPDl+mna/BqEzjyo3LsxB5HoB71oeJPFdrqeu/2toNtPp8mzY7fwydjgf41Un0BZ2tUhlEQZBz1+b0p+s+H9f0fTYkudLeKxVtgu0x+8/XvUmBm6V4g1DTrK70+2ufLgvP8Aj5DJxyeSPwrRsdbvdP0m80BL2G2025+d7h4DIZOOB7ZrnWeUTvbxK5c/3Mnj8qsR6vd6erwrKVdsffXp7YqhnoPguCJNNj+zaZZyXfKfbNUJ2BDxlVz1weK1PCeiLBc6npl3rO6NJRJH9lcxo+euBnpXB6X4yt4/L/tONtR7eVuKbfce9ddpP/CutTvfOa41HSrtv+WVxMeST9OlBR6HDolpbtviWaRB/wBNiTn1HPNYXj20t4PD096sO2V2Ckocbj7itKy8PXGmbJdO1iYxf7ZDxsOuQaofEV2/4RMs6jeZR8w5BOKURvY8oG37rc0ChR/KgVpaxi9yRTUgqBTT91MLE+6lU/NVcPUiPVdAROTSiod/8qasny1LYF6IfvI/98fzr2e1GLCBf9gV4jp++S7hT/aH869njleO2i28/KM+1S2aQR6TRRRWggooooA+Dn5q7oVu0+pbF4+U1JFaIn3lJ9avQCG3bei7TzULVCMG6Oy7l+buaiHz/wANaz2cPmb2yc1Kkap91BTGkVFtHljTdwBViOBE+4tSAf7VOxSsOxE8rp9zIpY3lf7z0j01eKdg5USTMzrt96SN/LaheWpJx/FTGkiSdN67vaqoH6VaR98dRdPrSAgdc02KXymqZhVeQfrST6D03Os8Pa15EifMNleo6berPbbt42dvrXgME7QN+Ndr4c8U+QyJK4ZDj8K5K9C+qO/D4hWsz1+GTH8WanJytY9hfLdwI9u+5O/fFXFu8L83Y4PFedJOLsztVmrokuFBX8KybmDC/c3Vfe5iP8VVJ5V2/fqXqtC4O2hi3FtFJn5cVjXdpit6UI7O248dqzZmX7vP5VUW0aatGC/yZ+X9Kyrmb5vu1v3Ma1lzQfN92t4MykrmDKu9qiMdaskC1C0OflVf1rpTOaUTOMS09LarwtvWpfKxVcxHImVFtlNSiNY2+WpSMVC5xQncGkloZ+pHMD1kwv5cgde2P51o3z/K/vWZH96umntY4Kj949BhGl6rbTWX2e8vNS8oNbfZOz+9R32meNPtOlaDqjSDzDmCGSQdvX/69Z3h82l3diJ/tNrccbbi2k2/n6iu60CBv+Ez8rUNe+1SQW3+iSyds9c+posRymDY+EvE093Nqeg/Zl+zN5bfvB8pHXg9aytTGqafrVnfeIbfyp/ODltissi5/u9DXbnV5dD8NXSy7YY7u9KNOi8yf3senFcRcyy+NfFkNpZI8dmmI0VyTsQY3Z+tKJOxe8WeNNNuL6SLSdO0+SAx8ytahGz04GOOfSl0zx3LcaP/AGdqejadqEaLgSSIFk/ArzV/4iaNp8etaDpdp5cUexUlZQBxkZye5xmuH1P7DYX88WlvJJ5blBMT1A/xpiPXfC95d6faQTW+n3NtpVyf3QdzLHGPxyR3rQ+I5/4pWNl6GccjgHjsK8j0Pxfq+jKUhuZ/L/55n7p/A8Cuj1rxw2u6bFYtb+SBhmXsG9R6A0izIH3aAKjB60pkrRWsYtC5pC9Rl6YZKQ7E4eniT5aqCRacHpNhYtCWmyS+XGWWo1Zf8Kild449zLlKhsLGlp1wv9pWjL/E6ivb4xhdm5eABXzva3nkXNu/ZJlbpk4zk16zdfErQYJPniv2m4wseMZx3OOBQXF2Pd6KKK2EFFFFAHxcxqMH+Gk3U0mjZAh5X/ZqAlk+WrHn/Ltpk0f8S+lSUR08VAHp6tQIkcfLUB4qcn5agIoGPjPzU6c/LTBT3XK/hTEVrWTHy+9WJV/iWqMZ2T1pxcwUrDKxqMjK1NIlNxSAqlMVDlo/u8Vefmqkq0wV1qjc8P8Aia40y5j/AHr7M8rk4xXr+leIrHVYBs+/3Xvmvn/Oz5lrR0zV7iynDJKV6Vz1qHNsdVHEOOjPoJreE+1UZ4EC/wAqwfDnjO3vYPs1wwWbj5nrpZApX72eOPpXmTpuDselTqKRhyw/Mdj7aoy+any78/hWtcbU/GsqUruqEdKZQlFUpYs1pSmqsgz8taxYnEy5YlSq4Tf91K1GtN7fNU8USx/KqVqpmbhcyBA5/hqMwsK22j/2KqzJ/eXFNTI5GkzKcVSuDsX8Kv3bJAu5q5y/vcttSumEW1c4qk7XRBdvlqqrSksfmpUH8VdSVkcM3dmrpF01vrUTQsVQ4GK9PjmttP1S11C4tll2dM9ea8o0lN+rQbVz84r1PVY1+ybXTdwK0hG9ykalzp//AAkt3Lfag9rJptpbvJaWlv8AL+8wSC47mm/DHRE0vTZ9TvfLF3fOdsL4DIoPUA8965/w5qbxXLwsz45A7nGK6LRpLL/hI3vtReRrgRlII5fu4PXj16VEoC5TO+L0CSWGmXEOzz95jTZ15OB/n3rA8VeHtP8AD3h7w1b3Nv8A6RO3mXTfxEE9DXWeI9P/ALc8Z6VZW8XlxW6eY7N9zPUH8wKzPHlpd6z4z0nT71ftMccJ/wCPfn37VGxDVjm9Wtk8LXs1v9m+1aNfpvtm67eOMH2rnRBNFZfaX5gkJGQc4weK9K1iGxv/AIVxW6zf6Vpz8DcPMQZPBFeYtBLb2ySv/wAerEcA9/elcRetLlXXY7HIqcutZ4ZopNysGz6cmrBkQr8j/PQSx5eoy1NL5/iqNnp3AkElOElVt9PRmdvlqWwLW7C7qpT3y7XTcaned0jPSsl3R2LO1C1YEiXK7vxHtV2LU/Pkhie1jmh3gusXDSAdiax9jSNtRd361ZaTytionlOv5596u1ho+6aKKKsAooooA+KM01x8tKjU5wpoGiEMp+Wpoj8u3dVcDYxpQf50hhcR7PmpqnNTScqKr5w1AE+f3dNUZpM/LQpoQC0qmkNNj+9QxFZxsnq3A9V7lMMG96mh27aARa2rItV2XZUgbY1K3PzUDKxqJ481YKfxU0f7XrSGUzF81RtHir5TNRulK+ohlhdvFJtZq9L8NeKUfZY30vHG2TufavLni2VZt58Rp82HH51lUpqaN6NVxZ7Nevhfu/Q9zWO0n7ys/wAKaw+o2UtpcPueHpnk4rZW2z87fSvMnDklZntU5qUUyEDK0xIldquLb1YhtP8AZqL9ja1iktv8x2rTHg2VvR2VQXdqqL9KE29BaHO3B2LWFqOqxW6uiuN/51L4juXin8lWKZriZgzzvufNd1Gkmrs4MRX5W0ia6vpblvvVV2VIE2UEV2xSSsjypzlJ3ZERTB/n61I4pij8/wCtUtSVub/hCz+2a7G20lIxn8a9JvYWeDbt28VmeDtGbTNF+0SqBLJ+ePStuQb4N3r09q6aSsmaJHG2B8jWNu7HNdw9kt4u/b8+Plbqee9cbfxeXqyP713Vgf8AQN27sKEt0VsS6ZqDW7GG9WORCu3ze+PQ1XvrTS7K/wD7eur2ezRE2hbGMuz+x+tQRlY5zu+5mr/lXdo3nWzFo/Tr+lZSp3E43OZudZ0u702e007whqE6Y+W7kjIb13N6151qtg9vptrN9kuo45GP7xz8kmDj5R2x717jJrV9JB9n5jQ/l+Xeq0mnQ3umiKaxElqmflTjGTyR6VHszNwPBrZmDblzkfyq227+Hg12HiXwh/Z0Z1DTIpJbVvvgclPrXDvdZk+b8jwazcbEuNiwg2L9/rSF8VHlaXCn+Kp1ESGRSv8AOlFx5a/LVd3UNtVqCdnytTsBJ57uvzVDIdi1IBmmtHltvahOzAgtVuHn/c579OOKcLd5Z365QjO/n9a29M1BNOjuGitkmdk2J5gzgnvWbFaS3N3HDE/MmPwOfSquNI+46KKKsQUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAf/9k=" alt="Cikgu ZZ"></div>
+      <div class="meet-badge">
+        <svg width="18" height="18" viewBox="0 0 24 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="1" y="3" width="15" height="14" rx="2.5" fill="#00AC47"/>
+          <path d="M16 8.2L22.2 4.4C22.8 4 23.5 4.4 23.5 5.1V14.9C23.5 15.6 22.8 16 22.2 15.6L16 11.8V8.2Z" fill="#00AC47"/>
+          <rect x="1" y="3" width="15" height="4.6" fill="#0066DA"/>
+          <path d="M1 5.5V3.9C1 3.4 1.4 3 1.9 3H4L1 5.5Z" fill="#FFBA00"/>
+          <rect x="1" y="12.4" width="15" height="4.6" fill="#EA4335"/>
+        </svg>
+        <span><span class="g-blue">G</span><span class="g-red">o</span><span class="g-yellow">o</span><span class="g-blue">g</span><span class="g-green">l</span><span class="g-red">e</span> Meet</span>
+      </div>
+      <p class="section-note" style="margin:-10px 0 16px; text-align:center;">Kelas akan menggunakan aplikasi Google Meet.</p>
+      <p class="sub">Isi maklumat di bawah. Cikgu ZZ akan sahkan tempahan melalui WhatsApp dalam masa 24 jam.</p>
+    </header>
+
+    <form id="bookingForm" novalidate>
+
+      <div class="section">
+        <p class="section-label">Maklumat Ibu Bapa &amp; Anak</p>
+        <div class="field">
+          <label for="parentName">Nama Ibu Bapa / Penjaga</label>
+          <input type="text" id="parentName" name="parentName" required autocomplete="name">
+        </div>
+        <div class="field">
+          <label for="parentPhone">No. WhatsApp</label>
+          <input type="tel" id="parentPhone" name="parentPhone" placeholder="0123456789" required autocomplete="tel">
+        </div>
+        <div class="field">
+          <label for="studentName">Nama Anak</label>
+          <input type="text" id="studentName" name="studentName" required>
+        </div>
+        <div class="field">
+          <label for="tingkatan">Tingkatan</label>
+          <select id="tingkatan" name="tingkatan" required>
+            <option value="" disabled selected>Pilih tingkatan</option>
+            <option>Tingkatan 1</option>
+            <option>Tingkatan 2</option>
+            <option>Tingkatan 3</option>
+            <option>Tingkatan 4</option>
+            <option>Tingkatan 5</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="section">
+        <p class="section-label">Subjek</p>
+        <div class="radio-row" id="subjekRow">
+          <label class="radio-chip">
+            <input type="radio" name="subjek" value="Matematik" required>
+            <span>Matematik</span>
+          </label>
+          <label class="radio-chip">
+            <input type="radio" name="subjek" value="Matematik Tambahan" id="subjekAddMath">
+            <span>Matematik Tambahan</span>
+          </label>
+        </div>
+        <p class="hint" id="addMathHint" style="display:none;">Matematik Tambahan hanya ditawarkan untuk Tingkatan 4 & 5.</p>
+      </div>
+
+      <div class="section">
+        <p class="section-label">Jenis Tempahan</p>
+        <p class="section-note">Pilih ikut apa yang sesuai untuk anak anda. Setiap kelas berdurasi 1 Jam 30 Minit.</p>
+        <div class="plan-grid">
+          <label class="plan-card">
+            <input type="radio" name="jenisTempahan" value="Ala Carte" required id="planAlaCarte">
+            <div class="box">
+              <p class="plan-title">Ala Carte</p>
+              <p class="plan-desc">Tempah 1 (sehingga 4) kelas one-off (tiada komitmen jangka panjang)</p>
+            </div>
+          </label>
+          <label class="plan-card">
+            <input type="radio" name="jenisTempahan" value="Pakej Bulanan" id="planPakej">
+            <div class="box">
+              <span class="plan-badge">Jimat 10%</span>
+              <p class="plan-title">Pakej Bulanan</p>
+              <p class="plan-desc">Slot tetap setiap minggu — 4 kelas sebulan.</p>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- ALA CARTE -->
+      <div class="section" id="alaCarteSection" style="display:none;">
+        <p class="section-label">Bilangan Kelas (Ala Carte)</p>
+        <p class="section-note">Pilih sehingga 4 kelas one-off — sesuai untuk tarikh/masa yang tak tetap setiap minggu.</p>
+        <div id="alaCarteClasses"></div>
+        <button type="button" class="add-link" id="addMoreClass">+ Tambah kelas</button>
+        <div class="price-note" id="alaCartePriceNote"></div>
+      </div>
+
+      <!-- PAKEJ BULANAN -->
+      <div class="section" id="pakejSection" style="display:none;">
+        <p class="section-label">Pilih Hari &amp; Masa Tetap</p>
+        <p class="section-note">Slot ini akan jadi milik anak anda setiap minggu (kelas peribadi 1-on-1) selama pakej berjalan. Selepas ditempah, slot ini tidak lagi ditawarkan kepada parent lain.</p>
+        <div class="field">
+          <label>Hari</label>
+          <div class="radio-row" id="pakejDayRow"></div>
+        </div>
+        <div id="pakejSlotContainer"></div>
+        <input type="hidden" id="pakejHari" name="pakejHari">
+        <input type="hidden" id="pakejSlotMasa" name="pakejSlotMasa">
+        <input type="hidden" id="pakejTarikhMula" name="pakejTarikhMula">
+        <div class="start-date-note" id="pakejStartDateNote" style="display:none;"></div>
+        <div class="price-note" id="pakejPriceNote"></div>
+      </div>
+
+      <div class="section">
+        <p class="section-label">Catatan (pilihan)</p>
+        <div class="field">
+          <textarea id="catatan" name="catatan" placeholder="Cth: topik yang perlu fokus, keperluan khas, dsb."></textarea>
+        </div>
+      </div>
+
+      <div class="submit-row">
+        <button type="submit" class="submit" id="submitBtn">Hantar Tempahan</button>
+        <div class="msg err" id="errMsg"></div>
+      </div>
+    </form>
+
+  </div>
+  <footer>
+    Sebarang masalah? WhatsApp <a href="https://wa.me/60142020400">014 2020 400</a>.
+  </footer>
+</div>
+
+<script>
+/* ============================================================
+   TETAPAN — EDIT DI SINI SAHAJA
+   ============================================================ */
+
+// 1) URL webhook untuk HANTAR tempahan (POST) — Make/Zapier/n8n.
+const BOOKING_WEBHOOK_URL = "https://hook.eu1.make.com/qftbb6n6ng0i4muzi3bp4cx69knsi6of";
+
+// 2) Google Sheet untuk semak ketersediaan slot — borang baca TERUS dari Sheet
+//    (guna "publish as CSV"), TIADA Make/webhook untuk bahagian ini.
+//    PENTING: Sheet mesti di-set "Anyone with the link can view" (Share > Change to anyone with the link).
+// PENTING (privasi): ini Sheet KETERSEDIAAN sahaja (tiada nama/telefon), diisi
+// automatik via IMPORTRANGE dari Sheet rekod sebenar (yang kekal Restricted/private).
+const SHEET_ID = "1faaObqDZF_avf5eCg_aB0HakJb4gWnlbDfaar1clzdg";
+const REKOD_SESI_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Ketersediaan`;
+const CUTI_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Cuti`;
+
+// 3) Jadual slot mengikut hari (0=Ahad, 1=Isnin ... 6=Sabtu).
+//    Setiap slot = 1 Jam 30 Minit.
+const SLOT_SCHEDULE = {
+  0: ["2:00 - 3:30 PM", "5:00 - 6:30 PM", "8:30 - 10:00 PM"],             // Ahad
+  1: ["9:00 - 10:30 AM", "5:00 - 6:30 PM", "8:30 - 10:00 PM"],           // Isnin
+  2: ["9:00 - 10:30 AM", "5:00 - 6:30 PM", "8:30 - 10:00 PM"],           // Selasa
+  3: ["9:00 - 10:30 AM", "5:00 - 6:30 PM", "8:30 - 10:00 PM"],           // Rabu
+  4: ["9:00 - 10:30 AM", "5:00 - 6:30 PM", "8:30 - 10:00 PM"],           // Khamis
+  5: ["9:00 - 10:30 AM", "5:00 - 6:30 PM", "8:30 - 10:00 PM"],           // Jumaat
+  6: ["9:00 - 10:30 AM"],                                                 // Sabtu
+};
+const DAY_NAMES = ["Ahad","Isnin","Selasa","Rabu","Khamis","Jumaat","Sabtu"];
+const DAYS_AHEAD_LIMIT = 90; // ~3 bulan ke depan (dulu 21 hari — terlalu pendek)
+const CLASS_DURATION = "1 Jam 30 Minit";
+
+// Rujukan masa mula/tamat (format 24-jam) untuk setiap label slot —
+// diguna untuk bina "Mula"/"Tamat" hantar terus ke webhook (untuk Google Calendar),
+// supaya Make TAK PERLU "pecahkan" teks julat masa (elak masalah macam array tadi).
+const SLOT_TIME_RANGES = {
+  "9:00 - 10:30 AM": { start: "09:00", end: "10:30" },
+  "2:00 - 3:30 PM":  { start: "14:00", end: "15:30" },
+  "5:00 - 6:30 PM":  { start: "17:00", end: "18:30" },
+  "8:30 - 10:00 PM": { start: "20:30", end: "22:00" },
+};
+function getDateTimeRange(dateStr, slotLabel){
+  const range = SLOT_TIME_RANGES[slotLabel];
+  if(!dateStr || !range) return { mula: "", tamat: "" };
+  return {
+    mula: `${dateStr}T${range.start}:00`,
+    tamat: `${dateStr}T${range.end}:00`
+  };
+}
+
+// Bina link "Tambah ke Google Calendar" — bila diklik, Calendar terus buka dengan
+// semua maklumat dah terisi (tinggal tekan Save). Cikgu ZZ kawal BILA nak klik
+// (cth lepas bayaran disahkan) — bukan automatik terus.
+function toGCalUTC(localDateTimeStr){
+  // localDateTimeStr cth "2026-09-15T09:00:00" — dianggap waktu Malaysia (UTC+8)
+  const [datePart, timePart] = localDateTimeStr.split('T');
+  const [y,m,d] = datePart.split('-').map(Number);
+  const [h,min,s] = timePart.split(':').map(Number);
+  const dt = new Date(y, m-1, d, h, min, s || 0);
+  return dt.toISOString().replace(/[-:]/g,'').split('.')[0] + 'Z';
+}
+function buildGCalLink(title, mula, tamat, details, recurRule){
+  if(!mula || !tamat) return "";
+  const params = new URLSearchParams({
+    action: "TEMPLATE",
+    text: title,
+    dates: `${toGCalUTC(mula)}/${toGCalUTC(tamat)}`,
+    details: details || ""
+  });
+  let url = `https://calendar.google.com/calendar/render?${params.toString()}`;
+  if(recurRule) url += `&recur=${encodeURIComponent(recurRule)}`;
+  return url;
+}
+
+// 4) Harga ikut tingkatan. Setiap tier: harga sekelas & jumlah pakej 4 kelas
+//    (pakej dah termasuk diskaun 10%).
+const PRICING_TIERS = {
+  "Tingkatan 1": { label: "Matematik T1 / T2 - Personal", single: 105, pakejPerClass: 94.50, pakejTotal: 378 },
+  "Tingkatan 2": { label: "Matematik T1 / T2 - Personal", single: 105, pakejPerClass: 94.50, pakejTotal: 378 },
+  "Tingkatan 3": { label: "Matematik T3 - Personal",      single: 110, pakejPerClass: 99,    pakejTotal: 396 },
+  "Tingkatan 4": { label: "Matematik / AddMath T4/T5 - Personal", single: 120, pakejPerClass: 108, pakejTotal: 432 },
+  "Tingkatan 5": { label: "Matematik / AddMath T4/T5 - Personal", single: 120, pakejPerClass: 108, pakejTotal: 432 },
+};
+const DISCOUNT_PERCENT = 10;
+
+function getTier(){
+  const tingkatan = document.getElementById('tingkatan').value;
+  return PRICING_TIERS[tingkatan] || null;
+}
+function fmtRM(n){
+  return "RM" + (Number.isInteger(n) ? n : n.toFixed(2));
+}
+
+/* ============================================================
+   Jangan ubah bahagian bawah ini melainkan pasti apa yang dibuat
+   ============================================================ */
+
+let availability = { recurringOccupied: [], oneOffOccupied: [], blockedDates: [] };
+
+// Parser CSV ringkas — cukup untuk data Google Sheets kita (handle koma dalam
+// petikan/quotes dengan asas, tak perlukan library luar).
+function parseCSV(text){
+  const rows = [];
+  let row = [], field = "", inQuotes = false;
+  for(let i = 0; i < text.length; i++){
+    const c = text[i], next = text[i+1];
+    if(inQuotes){
+      if(c === '"' && next === '"'){ field += '"'; i++; }
+      else if(c === '"'){ inQuotes = false; }
+      else field += c;
+    } else {
+      if(c === '"') inQuotes = true;
+      else if(c === ','){ row.push(field); field = ""; }
+      else if(c === '\n' || c === '\r'){
+        if(field !== "" || row.length){ row.push(field); rows.push(row); row = []; field = ""; }
+        if(c === '\r' && next === '\n') i++;
+      } else field += c;
+    }
+  }
+  if(field !== "" || row.length){ row.push(field); rows.push(row); }
+  return rows;
+}
+function csvToObjects(csvText){
+  const rows = parseCSV(csvText);
+  if(rows.length === 0) return [];
+  const headers = rows[0].map(h => h.trim());
+  return rows.slice(1)
+    .filter(r => r.some(cell => cell.trim() !== ""))
+    .map(r => {
+      const obj = {};
+      headers.forEach((h, i) => obj[h] = (r[i] || "").trim());
+      return obj;
+    });
+}
+function dayNameToNumber(name){
+  const idx = DAY_NAMES.indexOf(name);
+  return idx === -1 ? null : idx;
+}
+
+async function loadAvailability(){
+  try{
+    const [sesiRes, cutiRes] = await Promise.all([
+      fetch(REKOD_SESI_CSV_URL),
+      fetch(CUTI_CSV_URL)
+    ]);
+    if(sesiRes.ok){
+      const rows = csvToObjects(await sesiRes.text());
+      const todayStr = toLocalISODate(new Date());
+      // Pakej hanya dianggap "masih occupy" slot tu kalau ADA sekurang-kurangnya satu
+      // baris Aktif dengan Tarikh >= hari ini — kalau semua 4 tarikh sesi dah LEPAS,
+      // pakej tu automatik anggap "natural expired" (tak perlu tunggu Cikgu ZZ tukar
+      // Status ke "Tamat" secara manual — itu cuma perlu untuk pembatalan AWAL).
+      const pakejRows = rows.filter(r => r.JenisTempahan === "Pakej" && r.Status === "Aktif");
+      const stillActiveKeys = new Set(
+        pakejRows
+          .filter(r => r.Tarikh >= todayStr)
+          .map(r => `${r.Hari}|${r.Masa}`)
+      );
+      availability.recurringOccupied = pakejRows
+        .filter(r => stillActiveKeys.has(`${r.Hari}|${r.Masa}`))
+        .map(r => ({ day: dayNameToNumber(r.Hari), time: r.Masa }))
+        .filter(r => r.day !== null);
+      availability.oneOffOccupied = rows
+        .filter(r => r.JenisTempahan === "AlaCarte" && r.Status === "Aktif")
+        .map(r => ({ date: r.Tarikh, time: r.Masa }));
+    }
+    if(cutiRes.ok){
+      const rows = csvToObjects(await cutiRes.text());
+      // Cuti sekarang boleh ada lajur "Masa" (pilihan). Kalau Masa kosong = block
+      // SELURUH hari tu. Kalau Masa diisi = block SLOT tu sahaja pada tarikh tu.
+      availability.blockedDates = rows
+        .filter(r => r.Tarikh)
+        .map(r => ({ date: r.Tarikh, time: r.Masa || null }));
+    }
+  }catch(e){
+    // Gagal fetch (Sheet belum "anyone with link", atau isu rangkaian) —
+    // teruskan dengan semua slot dianggap kosong, borang tetap boleh function.
+    console.warn("Tak dapat semak ketersediaan slot dari Sheet, semua slot dipaparkan kosong buat masa ini.", e);
+  }
+}
+
+function isRecurringTaken(day, time){
+  return availability.recurringOccupied.some(r => r.day === day && r.time === time);
+}
+function isOneOffTaken(dateStr, time){
+  return availability.oneOffOccupied.some(o => o.date === dateStr && o.time === time);
+}
+// dateStr sahaja = semak "seluruh hari tu cuti?" (untuk sekat date-picker terus).
+// dateStr + time = semak "slot spesifik ni cuti?" (block=seluruh hari ATAU slot ni sahaja).
+function isDateBlocked(dateStr, time){
+  return availability.blockedDates.some(b =>
+    b.date === dateStr && (b.time === null || (time && b.time === time))
+  );
+}
+function isWholeDateBlocked(dateStr){
+  return availability.blockedDates.some(b => b.date === dateStr && b.time === null);
+}
+// Cari tarikh mula Pakej yang betul-betul bebas untuk 4 minggu berturut —
+// bukan sekadar terima/tolak minggu PERTAMA yang tersedia. Kalau minggu pertama
+// clash (cth dah ada Ala Carte), automatik cuba minggu seterusnya, dan seterusnya,
+// sehingga jumpa 4 minggu berturut yang semuanya bebas.
+const PAKEJ_SEARCH_LIMIT_DAYS = 90; // cari sehingga ~3 bulan ke depan kalau perlu
+function findPakejStartDate(targetDay, time){
+  const today = new Date();
+  for(let i = 0; i <= PAKEJ_SEARCH_LIMIT_DAYS; i++){
+    const d = new Date(today);
+    d.setDate(today.getDate() + i);
+    if(d.getDay() !== targetDay) continue;
+    const candidate = toLocalISODate(d);
+    if(isWholeDateBlocked(candidate)) continue;
+
+    // Semak 4 minggu berturut dari calon tarikh mula ni — semua kena bebas
+    let allClear = true;
+    for(let w = 0; w < 4; w++){
+      const wd = new Date(d);
+      wd.setDate(d.getDate() + (w * 7));
+      const wStr = toLocalISODate(wd);
+      if(isOneOffTaken(wStr, time) || isDateBlocked(wStr, time)){
+        allClear = false;
+        break;
+      }
+    }
+    if(allClear) return candidate;
+  }
+  return null;
+}
+// Semak Pakej betul-betul kosong — bukan sekadar "tiada Pakej lain di slot ni",
+// tapi cari tarikh mula (mana-mana minggu, bukan semestinya minggu pertama) yang
+// bebas dari Ala Carte DAN Cuti untuk kesemua 4 minggu berturut.
+function isPakejSlotAvailable(day, time){
+  if(isRecurringTaken(day, time)) return false;
+  return findPakejStartDate(day, time) !== null;
+}
+function toLocalISODate(d){
+  // Elak bug toISOString() (tukar ke UTC) yang boleh buat tarikh "hari ini"
+  // di Malaysia (UTC+8) jadi terpotong ke semalam pada awal pagi (12am-7:59am),
+  // menyebabkan min/max date jadi salah dan tarikh lepas boleh dipilih.
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+function dayOfWeek(dateStr){
+  const [y,m,d] = dateStr.split('-').map(Number);
+  return new Date(y, m-1, d).getDay();
+}
+function nextDateForWeekday(targetDay, time){
+  return findPakejStartDate(targetDay, time);
+}
+function fmtDateBounds(input){
+  const today = new Date();
+  const max = new Date();
+  max.setDate(today.getDate() + DAYS_AHEAD_LIMIT);
+  input.min = toLocalISODate(today);
+  input.max = toLocalISODate(max);
+}
+
+/* ---------- ALA CARTE ---------- */
+
+const alaCarteSection = document.getElementById('alaCarteSection');
+const alaCarteClasses = document.getElementById('alaCarteClasses');
+const addMoreClassBtn = document.getElementById('addMoreClass');
+const MAX_ALA_CARTE_CLASSES = 4;
+let classBlockCount = 0;
+
+function buildClassBlock(index){
+  const wrap = document.createElement('div');
+  wrap.className = 'class-block';
+  wrap.dataset.index = index;
+
+  const head = document.createElement('div');
+  head.className = 'class-block-head';
+  const label = document.createElement('b');
+  label.className = 'class-block-label';
+  label.textContent = `Kelas #${index}`;
+  head.appendChild(label);
+
+  const removeBtn = document.createElement('button');
+  removeBtn.type = 'button';
+  removeBtn.className = 'remove-link';
+  removeBtn.textContent = 'Buang';
+  removeBtn.style.display = index === 1 ? 'none' : 'inline';
+  removeBtn.addEventListener('click', () => {
+    wrap.remove();
+    classBlockCount--;
+    renumberClassBlocks();
+    updateAddButtonVisibility();
+    updateAlaCartePriceNote();
+  });
+  head.appendChild(removeBtn);
+  wrap.appendChild(head);
+
+  const dateField = document.createElement('div');
+  dateField.className = 'field';
+  dateField.innerHTML = `<label>Tarikh</label><input type="date" class="ac-date" required>`;
+  wrap.appendChild(dateField);
+
+  const slotDiv = document.createElement('div');
+  slotDiv.className = 'ac-slots';
+  wrap.appendChild(slotDiv);
+
+  const hiddenSlot = document.createElement('input');
+  hiddenSlot.type = 'hidden';
+  hiddenSlot.className = 'ac-slot-value';
+  wrap.appendChild(hiddenSlot);
+
+  const dateInput = dateField.querySelector('.ac-date');
+  fmtDateBounds(dateInput);
+  dateInput.addEventListener('change', () => renderAlaCarteSlots(dateInput, slotDiv, hiddenSlot));
+
+  return wrap;
+}
+
+function renumberClassBlocks(){
+  [...alaCarteClasses.querySelectorAll('.class-block')].forEach((block, i) => {
+    const idx = i + 1;
+    block.dataset.index = idx;
+    block.querySelector('.class-block-label').textContent = `Kelas #${idx}`;
+    block.querySelector('.remove-link').style.display = idx === 1 ? 'none' : 'inline';
+  });
+}
+
+function updateAddButtonVisibility(){
+  addMoreClassBtn.style.display = classBlockCount >= MAX_ALA_CARTE_CLASSES ? 'none' : 'inline-block';
+}
+
+function renderAlaCarteSlots(dateInput, slotDiv, hiddenSlot){
+  slotDiv.innerHTML = "";
+  hiddenSlot.value = "";
+  if(!dateInput.value) return;
+
+  if(isWholeDateBlocked(dateInput.value)){
+    slotDiv.innerHTML = `<p class="slot-empty">Cikgu ZZ bercuti pada tarikh ini. Sila pilih tarikh lain.</p>`;
+    return;
+  }
+
+  const day = dayOfWeek(dateInput.value);
+  const slots = SLOT_SCHEDULE[day] || [];
+  if(slots.length === 0){
+    slotDiv.innerHTML = `<p class="slot-empty">Tiada slot tersedia pada hari ini. Sila pilih tarikh lain.</p>`;
+    return;
+  }
+  const grid = document.createElement('div');
+  grid.className = 'slot-grid';
+  slots.forEach(time => {
+    const taken = isRecurringTaken(day, time) || isOneOffTaken(dateInput.value, time) || isDateBlocked(dateInput.value, time);
+    const btn = document.createElement('div');
+    btn.className = 'slot-btn' + (taken ? ' full' : '');
+    btn.textContent = taken ? `${time} (Penuh)` : time;
+    if(!taken){
+      btn.addEventListener('click', () => {
+        grid.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        hiddenSlot.value = time;
+      });
+    }
+    grid.appendChild(btn);
+  });
+  slotDiv.appendChild(grid);
+}
+
+function addClassBlock(){
+  if(classBlockCount >= MAX_ALA_CARTE_CLASSES) return;
+  classBlockCount++;
+  const block = buildClassBlock(classBlockCount);
+  alaCarteClasses.appendChild(block);
+  updateAddButtonVisibility();
+  updateAlaCartePriceNote();
+}
+
+addMoreClassBtn.addEventListener('click', addClassBlock);
+
+function updateAlaCartePriceNote(){
+  const note = document.getElementById('alaCartePriceNote');
+  const tier = getTier();
+  if(!tier){
+    note.innerHTML = `<p class="pn-empty">Sila pilih tingkatan dahulu untuk lihat harga.</p>`;
+    return;
+  }
+  const n = classBlockCount || 1;
+  const fullPrice = tier.single * n;
+  const qualifiesForDiscount = (n === 4);
+  const jumlah = qualifiesForDiscount ? Math.round(fullPrice * (1 - DISCOUNT_PERCENT/100)) : fullPrice;
+
+  let priceLine;
+  if(qualifiesForDiscount){
+    priceLine = `${fmtRM(tier.single)} x ${n} kelas — <span class="pn-badge">Jimat ${DISCOUNT_PERCENT}%</span> = <b>${fmtRM(jumlah)}</b>`;
+  } else if(n > 1){
+    priceLine = `${fmtRM(tier.single)} x ${n} kelas = <b>${fmtRM(jumlah)}</b>`;
+  } else {
+    priceLine = `Satu Kelas: <b>${fmtRM(jumlah)}</b>`;
+  }
+
+  note.innerHTML = `
+    <p class="pn-title">${tier.label}</p>
+    <p class="pn-line">Durasi Kelas: <b>${CLASS_DURATION}</b></p>
+    <p class="pn-line">Modul disediakan.</p>
+    <p class="pn-line">${priceLine}</p>
+    ${!qualifiesForDiscount && n < 4 ? `<p class="pn-hint">Pilih 4 kelas untuk jimat ${DISCOUNT_PERCENT}%.</p>` : ""}
+  `;
+}
+
+/* ---------- PAKEJ BULANAN ---------- */
+
+const pakejSection = document.getElementById('pakejSection');
+const pakejDayRow = document.getElementById('pakejDayRow');
+const pakejSlotContainer = document.getElementById('pakejSlotContainer');
+const pakejHariHidden = document.getElementById('pakejHari');
+const pakejSlotHidden = document.getElementById('pakejSlotMasa');
+const pakejTarikhMulaHidden = document.getElementById('pakejTarikhMula');
+const pakejStartNote = document.getElementById('pakejStartDateNote');
+
+function buildPakejDayChips(){
+  pakejDayRow.innerHTML = "";
+  Object.keys(SLOT_SCHEDULE).forEach(dayStr => {
+    const day = Number(dayStr);
+    if((SLOT_SCHEDULE[day] || []).length === 0) return;
+    const chip = document.createElement('label');
+    chip.className = 'radio-chip';
+    chip.innerHTML = `<input type="radio" name="pakejDay" value="${day}"><span>${DAY_NAMES[day]}</span>`;
+    chip.querySelector('input').addEventListener('change', () => renderPakejSlots(day));
+    pakejDayRow.appendChild(chip);
+  });
+}
+
+function renderPakejSlots(day){
+  pakejSlotContainer.innerHTML = "";
+  pakejHariHidden.value = DAY_NAMES[day];
+  pakejSlotHidden.value = "";
+  pakejStartNote.style.display = 'none';
+
+  const slots = SLOT_SCHEDULE[day] || [];
+  const grid = document.createElement('div');
+  grid.className = 'slot-grid';
+  slots.forEach(time => {
+    const taken = !isPakejSlotAvailable(day, time);
+    const btn = document.createElement('div');
+    btn.className = 'slot-btn' + (taken ? ' full' : '');
+    btn.textContent = taken ? `${time} (Penuh)` : time;
+    if(!taken){
+      btn.addEventListener('click', () => {
+        grid.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        pakejSlotHidden.value = time;
+        const startDate = nextDateForWeekday(day, time);
+        pakejTarikhMulaHidden.value = startDate;
+        pakejStartNote.style.display = 'block';
+        pakejStartNote.textContent = `Kelas bermula ${startDate}, berulang setiap ${DAY_NAMES[day]} pada ${time} — 4 sesi sebulan.`;
+      });
+    }
+    grid.appendChild(btn);
+  });
+  pakejSlotContainer.appendChild(grid);
+}
+
+function updatePakejPriceNote(){
+  const note = document.getElementById('pakejPriceNote');
+  const tier = getTier();
+  if(!tier){
+    note.innerHTML = `<p class="pn-empty">Sila pilih tingkatan dahulu untuk lihat harga.</p>`;
+    return;
+  }
+  note.innerHTML = `
+    <p class="pn-title">${tier.label}</p>
+    <p class="pn-line">Durasi Kelas: <b>${CLASS_DURATION}</b></p>
+    <p class="pn-line">Modul disediakan.</p>
+    <p class="pn-line">Pakej 4 Kelas (diskaun ${DISCOUNT_PERCENT}%): <b>${fmtRM(tier.pakejPerClass)} x 4 = ${fmtRM(tier.pakejTotal)}</b></p>
+  `;
+}
+
+/* ---------- TOGGLE JENIS TEMPAHAN & TINGKATAN ---------- */
+
+function refreshVisiblePriceNote(){
+  if(alaCarteSection.style.display === 'block') updateAlaCartePriceNote();
+  if(pakejSection.style.display === 'block') updatePakejPriceNote();
+}
+
+document.getElementById('planAlaCarte').addEventListener('change', () => {
+  alaCarteSection.style.display = 'block';
+  pakejSection.style.display = 'none';
+  if(classBlockCount === 0) addClassBlock();
+  updateAlaCartePriceNote();
+});
+document.getElementById('planPakej').addEventListener('change', () => {
+  pakejSection.style.display = 'block';
+  alaCarteSection.style.display = 'none';
+  updatePakejPriceNote();
+});
+document.getElementById('tingkatan').addEventListener('change', () => {
+  refreshVisiblePriceNote();
+  updateSubjekAvailability();
+});
+
+/* ---------- SUBMIT ---------- */
+
+const form = document.getElementById('bookingForm');
+const submitBtn = document.getElementById('submitBtn');
+const errMsg = document.getElementById('errMsg');
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  errMsg.classList.remove('show');
+
+  if(!form.reportValidity()) return;
+
+  const jenisTempahan = form.querySelector('input[name=jenisTempahan]:checked')?.value;
+  if(!jenisTempahan){
+    errMsg.textContent = "Sila pilih Jenis Tempahan.";
+    errMsg.classList.add('show');
+    return;
+  }
+
+  const tier = getTier();
+
+  const payload = {
+    parentName: document.getElementById('parentName').value.trim(),
+    parentPhone: document.getElementById('parentPhone').value.trim(),
+    studentName: document.getElementById('studentName').value.trim(),
+    tingkatan: document.getElementById('tingkatan').value,
+    subjek: form.querySelector('input[name=subjek]:checked')?.value || "",
+    catatan: document.getElementById('catatan').value.trim(),
+    jenisTempahan,
+    durasiKelas: CLASS_DURATION,
+    pakejLabel: tier ? tier.label : "",
+    dihantarPada: new Date().toISOString(),
+    sumber: "Borang Tempahan Kelas Peribadi — akademizz"
+  };
+
+  if(jenisTempahan === "Ala Carte"){
+    const blocks = [...alaCarteClasses.querySelectorAll('.class-block')];
+    const kelas = [];
+    for(const block of blocks){
+      const tarikh = block.querySelector('.ac-date').value;
+      const slotMasa = block.querySelector('.ac-slot-value').value;
+      if(!tarikh || !slotMasa){
+        errMsg.textContent = "Sila lengkapkan tarikh & slot untuk setiap kelas.";
+        errMsg.classList.add('show');
+        return;
+      }
+      kelas.push({ tarikh, slotMasa });
+    }
+    payload.bilanganKelas = kelas.length;
+    // Hantar sebagai field rata (kelas1Tarikh, kelas1Masa, dst) — BUKAN array bersarang —
+    // supaya Make.com tak perlu Iterator untuk proses (elak isu nested array yang mengelirukan).
+    for(let i = 0; i < 4; i++){
+      const tarikh = kelas[i] ? kelas[i].tarikh : "";
+      const masa = kelas[i] ? kelas[i].slotMasa : "";
+      const { mula, tamat } = getDateTimeRange(tarikh, masa);
+      payload[`kelas${i+1}Tarikh`] = tarikh;
+      payload[`kelas${i+1}Masa`] = masa;
+      payload[`kelas${i+1}Mula`] = mula;
+      payload[`kelas${i+1}Tamat`] = tamat;
+      payload[`kelas${i+1}CalLink`] = mula
+        ? buildGCalLink(`Kelas ${form.querySelector('input[name=subjek]:checked')?.value || ''} - ${document.getElementById('studentName').value.trim()}`, mula, tamat, document.getElementById('catatan').value.trim())
+        : "";
+    }
+    payload.hargaSeKelas = tier ? tier.single : null;
+    const fullPriceAlaCarte = tier ? tier.single * kelas.length : null;
+    const alaCarteQualifiesDiscount = kelas.length === 4;
+    payload.jumlahHarga = tier
+      ? (alaCarteQualifiesDiscount ? Math.round(fullPriceAlaCarte * (1 - DISCOUNT_PERCENT/100)) : fullPriceAlaCarte)
+      : null;
+    if(alaCarteQualifiesDiscount) payload.diskaun = `${DISCOUNT_PERCENT}%`;
+  } else {
+    if(!pakejHariHidden.value || !pakejSlotHidden.value || !pakejTarikhMulaHidden.value){
+      errMsg.textContent = "Sila pilih hari & slot masa untuk pakej bulanan.";
+      errMsg.classList.add('show');
+      return;
+    }
+    payload.bilanganKelas = 4;
+    payload.hariRecurring = pakejHariHidden.value;
+    payload.slotMasa = pakejSlotHidden.value;
+    payload.tarikhMula = pakejTarikhMulaHidden.value;
+    // Kira semua 4 tarikh sesi terus di sini (bukan dalam Make) — elak perlu formula
+    // tarikh yang rumit dalam Make, sama prinsip macam kelas1Tarikh untuk Ala Carte.
+    const [sy, sm, sd] = pakejTarikhMulaHidden.value.split('-').map(Number);
+    for(let i = 0; i < 4; i++){
+      const d = new Date(sy, sm - 1, sd);
+      d.setDate(d.getDate() + (i * 7));
+      const tarikhSesi = toLocalISODate(d);
+      const { mula, tamat } = getDateTimeRange(tarikhSesi, pakejSlotHidden.value);
+      payload[`pakejSesi${i+1}Tarikh`] = tarikhSesi;
+      payload[`pakejSesi${i+1}Mula`] = mula;
+      payload[`pakejSesi${i+1}Tamat`] = tamat;
+    }
+    // Satu link sahaja untuk Pakej — guna "recur" supaya SATU klik terus tambah
+    // event berulang 4 minggu (bukan kena klik 4 kali).
+    payload.pakejCalLink = buildGCalLink(
+      `Kelas ${form.querySelector('input[name=subjek]:checked')?.value || ''} - ${document.getElementById('studentName').value.trim()}`,
+      payload.pakejSesi1Mula, payload.pakejSesi1Tamat,
+      document.getElementById('catatan').value.trim(),
+      "RRULE:FREQ=WEEKLY;COUNT=4"
+    );
+    payload.ulangan = "Mingguan (4 sesi/bulan)";
+    payload.diskaun = `${DISCOUNT_PERCENT}%`;
+    payload.hargaSeKelas = tier ? tier.pakejPerClass : null;
+    payload.jumlahHarga = tier ? tier.pakejTotal : null;
+  }
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Menghantar...";
+
+  try{
+    const res = await fetch(BOOKING_WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    if(!res.ok) throw new Error("Webhook error: " + res.status);
+
+    // Bina ringkasan jadual untuk dipaparkan di halaman Thank You
+    let scheduleInfo = "";
+    if(payload.jenisTempahan === "Ala Carte"){
+      const classList = [];
+      for(let i = 1; i <= 4; i++){
+        if(payload[`kelas${i}Tarikh`]) classList.push(`${payload[`kelas${i}Tarikh`]} ${payload[`kelas${i}Masa`]}`);
+      }
+      scheduleInfo = classList.join(" & ");
+    } else {
+      scheduleInfo = `Setiap ${payload.hariRecurring}, ${payload.slotMasa}`;
+    }
+
+    const redirectParams = new URLSearchParams({
+      parentName: payload.parentName,
+      studentName: payload.studentName,
+      tingkatan: payload.tingkatan,
+      subjek: payload.subjek,
+      jenisTempahan: payload.jenisTempahan,
+      scheduleInfo: scheduleInfo,
+      jumlahHarga: payload.jumlahHarga || ""
+    });
+
+    window.location.href = "terima-kasih.html?" + redirectParams.toString();
+    return;
+
+  } catch(err){
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Hantar Tempahan";
+    errMsg.textContent = "Maaf, tempahan gagal dihantar. Sila cuba lagi atau hubungi kami terus melalui WhatsApp.";
+    errMsg.classList.add('show');
+  }
+});
+
+/* ---------- SUBJEK <-> TINGKATAN RULE ---------- */
+// Matematik Tambahan hanya untuk Tingkatan 4 & 5.
+const RESTRICTED_TINGKATAN_FOR_ADDMATH = ["Tingkatan 1", "Tingkatan 2", "Tingkatan 3"];
+
+function updateSubjekAvailability(){
+  const tingkatan = document.getElementById('tingkatan').value;
+  const addMathRadio = document.getElementById('subjekAddMath');
+  const addMathChip = addMathRadio.closest('.radio-chip');
+  const hint = document.getElementById('addMathHint');
+  const restricted = RESTRICTED_TINGKATAN_FOR_ADDMATH.includes(tingkatan);
+
+  addMathRadio.disabled = restricted;
+  addMathChip.style.opacity = restricted ? '0.4' : '1';
+  hint.style.display = restricted ? 'block' : 'none';
+
+  if(restricted && addMathRadio.checked){
+    addMathRadio.checked = false;
+  }
+}
+
+/* ---------- INIT ---------- */
+(async function init(){
+  await loadAvailability();
+  buildPakejDayChips();
+  updateSubjekAvailability();
+})();
+</script>
+
+</body>
+</html>
