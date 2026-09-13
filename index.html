@@ -327,15 +327,16 @@ const CUTI_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq
 //    Setiap slot = 1 Jam 30 Minit.
 const SLOT_SCHEDULE = {
   0: ["2:00 - 3:30 PM", "5:00 - 6:30 PM", "8:30 - 10:00 PM"],             // Ahad
-  1: ["9:00 - 10:30 AM", "5:00 - 6:30 PM", "8:30 - 10:00 PM"],           // Isnin
-  2: ["9:00 - 10:30 AM", "5:00 - 6:30 PM", "8:30 - 10:00 PM"],           // Selasa
-  3: ["9:00 - 10:30 AM", "5:00 - 6:30 PM", "8:30 - 10:00 PM"],           // Rabu
-  4: ["9:00 - 10:30 AM", "5:00 - 6:30 PM", "8:30 - 10:00 PM"],           // Khamis
-  5: ["9:00 - 10:30 AM", "5:00 - 6:30 PM", "8:30 - 10:00 PM"],           // Jumaat
+  1: ["9:00 - 10:30 AM", "2:00 - 3:30 PM", "5:00 - 6:30 PM", "8:30 - 10:00 PM"],  // Isnin
+  2: ["9:00 - 10:30 AM", "2:00 - 3:30 PM", "5:00 - 6:30 PM", "8:30 - 10:00 PM"],  // Selasa
+  3: ["9:00 - 10:30 AM", "2:00 - 3:30 PM", "5:00 - 6:30 PM", "8:30 - 10:00 PM"],  // Rabu
+  4: ["9:00 - 10:30 AM", "2:00 - 3:30 PM", "5:00 - 6:30 PM", "8:30 - 10:00 PM"],  // Khamis
+  5: ["9:00 - 10:30 AM", "2:00 - 3:30 PM", "5:00 - 6:30 PM", "8:30 - 10:00 PM"],  // Jumaat
   6: ["9:00 - 10:30 AM"],                                                 // Sabtu
 };
 const DAY_NAMES = ["Ahad","Isnin","Selasa","Rabu","Khamis","Jumaat","Sabtu"];
 const DAYS_AHEAD_LIMIT = 90; // ~3 bulan ke depan (dulu 21 hari — terlalu pendek)
+const MIN_LEAD_DAYS = 3; // tempahan tak boleh dibuat kurang dari 3 hari sebelum kelas
 const CLASS_DURATION = "1 Jam 30 Minit";
 
 // Rujukan masa mula/tamat (format 24-jam) untuk setiap label slot —
@@ -510,7 +511,7 @@ function isWholeDateBlocked(dateStr){
 const PAKEJ_SEARCH_LIMIT_DAYS = 90; // cari sehingga ~3 bulan ke depan kalau perlu
 function findPakejStartDate(targetDay, time){
   const today = new Date();
-  for(let i = 0; i <= PAKEJ_SEARCH_LIMIT_DAYS; i++){
+  for(let i = MIN_LEAD_DAYS; i <= PAKEJ_SEARCH_LIMIT_DAYS; i++){
     const d = new Date(today);
     d.setDate(today.getDate() + i);
     if(d.getDay() !== targetDay) continue;
@@ -557,9 +558,11 @@ function nextDateForWeekday(targetDay, time){
 }
 function fmtDateBounds(input){
   const today = new Date();
+  const min = new Date();
+  min.setDate(today.getDate() + MIN_LEAD_DAYS);
   const max = new Date();
   max.setDate(today.getDate() + DAYS_AHEAD_LIMIT);
-  input.min = toLocalISODate(today);
+  input.min = toLocalISODate(min);
   input.max = toLocalISODate(max);
 }
 
