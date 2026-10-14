@@ -489,7 +489,7 @@ async function loadAvailability(){
         .map(r => ({ day: dayNameToNumber(r.Hari), time: r.Masa }))
         .filter(r => r.day !== null);
       availability.oneOffOccupied = rows
-        .filter(r => r.JenisTempahan === "AlaCarte" && r.Status === "Aktif")
+        .filter(r => r.Status === "Aktif" && (r.JenisTempahan === "AlaCarte" || (r.JenisTempahan === "Pakej" && !r.Hari))) // Pakej tanpa Hari = sesi yang dipindah (sekatan tarikh+masa sahaja)
         .map(r => ({ date: r.Tarikh, time: r.Masa }));
     }
     if(cutiRes.ok){
