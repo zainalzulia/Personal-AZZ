@@ -84,7 +84,6 @@
   .no-fail{ font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--muted); margin-bottom: 10px; }
   h1{ font-family: 'Fraunces', serif; font-weight: 600; font-size: 29px; line-height: 1.18; color: var(--navy); margin: 0 0 10px; }
   .sub{ font-size: 15px; color: #4b4d57; max-width: 48ch; margin: 0 auto; }
-  .avail-line{ margin: 0; padding: 14px 34px; font-size: 14px; color: var(--ok); background: #eef4ef; border-bottom: 1px solid var(--paper-line); text-align: center; }
   .proof{ padding: 22px 34px; border-bottom: 1px solid var(--paper-line); }
   .avail-title{ font-family: 'Fraunces', serif; font-weight: 600; font-size: 18px; margin: 0 0 4px; color: var(--navy); }
   .proof .q{ margin: 0 0 14px; padding: 2px 0 2px 12px; border-left: 3px solid var(--brass); }
@@ -194,7 +193,7 @@
   @media (max-width: 480px){
     header.head, form{ padding-left: 22px; padding-right: 22px; }
     .plan-grid{ grid-template-columns: 1fr; }
-    .avail-line, .proof{ padding-left: 20px; padding-right: 20px; }
+    .proof{ padding-left: 20px; padding-right: 20px; }
   }
 </style>
 </head>
@@ -220,8 +219,6 @@
       <p class="section-note" style="margin:-10px 0 16px; text-align:center;">Kelas akan menggunakan aplikasi Google Meet.</p>
       <p class="sub">Isi maklumat di bawah. Cikgu ZZ akan sahkan tempahan melalui WhatsApp dalam masa 24 jam.</p>
     </header>
-
-    <p class="avail-line" id="availLine" style="display:none"></p>
 
     <section class="proof" id="proofBox" style="display:none" aria-labelledby="proofT">
       <h2 class="avail-title" id="proofT" style="margin-bottom:12px">Kata ibu bapa lain</h2>
@@ -1008,25 +1005,6 @@ function updateSubjekAvailability(){
   }
 }
 
-/* ---------- BARIS SLOT KOSONG (petang & malam) ---------- */
-function renderAvailability(){
-  try{
-    if(!availLoaded) return; // tak pasti = jangan paparkan apa-apa
-    const line = document.getElementById('availLine');
-    if(!line) return;
-    const evening = ["5:00 - 6:30 PM", "8:30 - 10:00 PM"];
-    const days = [1,2,3,4,5,6,0].filter(day =>
-      (SLOT_SCHEDULE[day] || []).some(t => evening.indexOf(t) !== -1 && isPakejSlotAvailable(day, t)));
-    const anyFree = [1,2,3,4,5,6,0].some(day => (SLOT_SCHEDULE[day] || []).some(t => isPakejSlotAvailable(day, t)));
-    if(days.length){
-      line.textContent = 'Slot petang dan malam yang masih kosong: ' + days.map(d => DAY_NAMES[d]).join(', ');
-    } else if(anyFree){
-      line.textContent = 'Slot petang dan malam sudah penuh. Slot pagi dan tengah hari masih ada.';
-    } else return;
-    line.style.display = 'block';
-  }catch(e){ console.warn('Tak dapat paparkan slot kosong', e); }
-}
-
 /* ---------- TESTIMONI (rawak 2 daripada senarai) ---------- */
 // Semua petikan verbatim daripada mesej WhatsApp ibu bapa. Tambah/buang baris di sini sahaja.
 const TESTIMONI = [
@@ -1057,7 +1035,6 @@ function renderTestimoni(){
 (async function init(){
   renderTestimoni();
   await loadAvailability();
-  renderAvailability();
   buildPakejDayChips();
   updateSubjekAvailability();
 })();
