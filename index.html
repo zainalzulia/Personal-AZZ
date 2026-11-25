@@ -84,6 +84,12 @@
   .no-fail{ font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--muted); margin-bottom: 10px; }
   h1{ font-family: 'Fraunces', serif; font-weight: 600; font-size: 29px; line-height: 1.18; color: var(--navy); margin: 0 0 10px; }
   .sub{ font-size: 15px; color: #4b4d57; max-width: 48ch; margin: 0 auto; }
+  .avail-line{ margin: 0; padding: 14px 34px; font-size: 14px; color: var(--ok); background: #eef4ef; border-bottom: 1px solid var(--paper-line); text-align: center; }
+  .proof{ padding: 22px 34px; border-bottom: 1px solid var(--paper-line); }
+  .avail-title{ font-family: 'Fraunces', serif; font-weight: 600; font-size: 18px; margin: 0 0 4px; color: var(--navy); }
+  .proof .q{ margin: 0 0 14px; padding: 2px 0 2px 12px; border-left: 3px solid var(--brass); }
+  .proof .q p{ margin: 0 0 3px; font-size: 15px; }
+  .proof .q cite{ font-style: normal; font-size: 13px; color: var(--muted); }
   form{ padding: 6px 34px 34px; }
   .section{ padding: 26px 0; border-bottom: 1px solid var(--paper-line); }
   .section:last-of-type{ border-bottom: none; }
@@ -188,6 +194,7 @@
   @media (max-width: 480px){
     header.head, form{ padding-left: 22px; padding-right: 22px; }
     .plan-grid{ grid-template-columns: 1fr; }
+    .avail-line, .proof{ padding-left: 20px; padding-right: 20px; }
   }
 </style>
 </head>
@@ -213,6 +220,14 @@
       <p class="section-note" style="margin:-10px 0 16px; text-align:center;">Kelas akan menggunakan aplikasi Google Meet.</p>
       <p class="sub">Isi maklumat di bawah. Cikgu ZZ akan sahkan tempahan melalui WhatsApp dalam masa 24 jam.</p>
     </header>
+
+    <p class="avail-line" id="availLine" style="display:none"></p>
+
+    <section class="proof" id="proofBox" style="display:none" aria-labelledby="proofT">
+      <h2 class="avail-title" id="proofT" style="margin-bottom:12px">Kata ibu bapa lain</h2>
+      <div id="proofList"></div>
+      <p class="section-note" style="margin:0">Petikan sebenar daripada mesej WhatsApp ibu bapa, tidak diubah.</p>
+    </section>
 
     <form id="bookingForm" novalidate>
 
@@ -424,6 +439,7 @@ function fmtRM(n){
    ============================================================ */
 
 let availability = { recurringOccupied: [], oneOffOccupied: [], blockedDates: [] };
+let availLoaded = false; // true hanya kalau Sheet berjaya dibaca (elak paparkan semua slot 'kosong' bila gagal)
 
 // Parser CSV ringkas — cukup untuk data Google Sheets kita (handle koma dalam
 // petikan/quotes dengan asas, tak perlukan library luar).
@@ -500,6 +516,7 @@ async function loadAvailability(){
         .filter(r => r.Tarikh)
         .map(r => ({ date: r.Tarikh, time: r.Masa || null }));
     }
+    availLoaded = !!(sesiRes.ok && cutiRes.ok);
   }catch(e){
     // Gagal fetch (Sheet belum "anyone with link", atau isu rangkaian) —
     // teruskan dengan semua slot dianggap kosong, borang tetap boleh function.
@@ -991,9 +1008,56 @@ function updateSubjekAvailability(){
   }
 }
 
+/* ---------- BARIS SLOT KOSONG (petang & malam) ---------- */
+function renderAvailability(){
+  try{
+    if(!availLoaded) return; // tak pasti = jangan paparkan apa-apa
+    const line = document.getElementById('availLine');
+    if(!line) return;
+    const evening = ["5:00 - 6:30 PM", "8:30 - 10:00 PM"];
+    const days = [1,2,3,4,5,6,0].filter(day =>
+      (SLOT_SCHEDULE[day] || []).some(t => evening.indexOf(t) !== -1 && isPakejSlotAvailable(day, t)));
+    const anyFree = [1,2,3,4,5,6,0].some(day => (SLOT_SCHEDULE[day] || []).some(t => isPakejSlotAvailable(day, t)));
+    if(days.length){
+      line.textContent = 'Slot petang dan malam yang masih kosong: ' + days.map(d => DAY_NAMES[d]).join(', ');
+    } else if(anyFree){
+      line.textContent = 'Slot petang dan malam sudah penuh. Slot pagi dan tengah hari masih ada.';
+    } else return;
+    line.style.display = 'block';
+  }catch(e){ console.warn('Tak dapat paparkan slot kosong', e); }
+}
+
+/* ---------- TESTIMONI (rawak 2 daripada senarai) ---------- */
+// Semua petikan verbatim daripada mesej WhatsApp ibu bapa. Tambah/buang baris di sini sahaja.
+const TESTIMONI = [
+  { q: "tk pernah dia dpt markah tinggi mcm ni..paling tinggi 60 shj..", by: "Ibu kepada Zarith, selepas dapat 92% dalam ujian" },
+  { q: "Terima kasih krn telah membimbing anak saya. X penah sepanjang dia sekolah dpt keputusan mcm nie utk maths ... syukur sgt2", by: "Ibu kepada Dalili, selepas dapat 100% dalam ujian" },
+  { q: "Alhamdulillah cikgu..ujian akhir tahun di sekolah pun dapat B..moga memberi motivasi utk lebih cemerlang..terima kasih cikgu", by: "Ayah kepada Ahmad, selepas dapat 73% dalam ujian" },
+  { q: "Alhamdulillah. Terima kasih byk2 cikgu2 di Akademi ZZ yg telah mengajar anak saya Aqid dgn baik. Semoga berkat ilmu yg diajar.", by: "Ibu kepada Aqid, selepas dapat 77% dalam ujian" },
+  { q: "Ainna sangat berpuas hati...katanya seronok belajar dengan cikgu tak boring tak sedar dah habis masa... Jelas dan faham..", by: "Keluarga Ainna" }
+];
+function renderTestimoni(){
+  try{
+    const box = document.getElementById('proofBox'), list = document.getElementById('proofList');
+    if(!box || !list) return;
+    const pool = TESTIMONI.slice();
+    for(let i = pool.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+    list.innerHTML = '';
+    pool.slice(0, 2).forEach(t => {
+      const d = document.createElement('div'); d.className = 'q';
+      const p = document.createElement('p'); p.textContent = '\u201C' + t.q + '\u201D';
+      const c = document.createElement('cite'); c.textContent = t.by;
+      d.appendChild(p); d.appendChild(c); list.appendChild(d);
+    });
+    box.style.display = 'block';
+  }catch(e){ console.warn('Tak dapat paparkan testimoni', e); }
+}
+
 /* ---------- INIT ---------- */
 (async function init(){
+  renderTestimoni();
   await loadAvailability();
+  renderAvailability();
   buildPakejDayChips();
   updateSubjekAvailability();
 })();
