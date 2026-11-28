@@ -524,8 +524,28 @@ async function loadAvailability(){
 function isRecurringTaken(day, time){
   return availability.recurringOccupied.some(r => r.day === day && r.time === time);
 }
+// Jadual tetap Cikgu ZZ sendiri (mingguan, bermula 5 Dis 2026, tanpa tarikh akhir).
+// Sama dengan tab Jadual_Tetap dalam Sheet. Kalau jadual berubah, kemas senarai ini juga.
+const JADUAL_TETAP = [
+  { day: 0, start: "17:00", end: "18:30" }, // Ahad    AddMath T4
+  { day: 1, start: "17:00", end: "18:15" }, // Isnin   Matematik T3
+  { day: 2, start: "20:00", end: "21:00" }, // Selasa  Matematik T1
+  { day: 2, start: "21:00", end: "22:00" }, // Selasa  Matematik T2
+  { day: 3, start: "17:00", end: "18:30" }, // Rabu    AddMath T5
+  { day: 4, start: "17:00", end: "18:15" }, // Khamis  Matematik T3
+  { day: 5, start: "20:00", end: "21:00" }, // Jumaat  Matematik T1
+  { day: 5, start: "21:00", end: "22:00" }  // Jumaat  Matematik T2
+];
+const JADUAL_TETAP_DARI = "2026-12-05";
+function hhmmToMin(t){ const [h,m] = t.split(':').map(Number); return h*60 + m; }
+function isTetapBlocked(dateStr, time){
+  const r = SLOT_TIME_RANGES[time];
+  if(!r || !dateStr || dateStr < JADUAL_TETAP_DARI) return false;
+  const day = dayOfWeek(dateStr), a = hhmmToMin(r.start), b = hhmmToMin(r.end);
+  return JADUAL_TETAP.some(t => t.day === day && hhmmToMin(t.start) < b && hhmmToMin(t.end) > a);
+}
 function isOneOffTaken(dateStr, time){
-  return availability.oneOffOccupied.some(o => o.date === dateStr && o.time === time);
+  return isTetapBlocked(dateStr, time) || availability.oneOffOccupied.some(o => o.date === dateStr && o.time === time);
 }
 // dateStr sahaja = semak "seluruh hari tu cuti?" (untuk sekat date-picker terus).
 // dateStr + time = semak "slot spesifik ni cuti?" (block=seluruh hari ATAU slot ni sahaja).
