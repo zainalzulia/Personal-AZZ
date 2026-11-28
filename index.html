@@ -524,25 +524,39 @@ async function loadAvailability(){
 function isRecurringTaken(day, time){
   return availability.recurringOccupied.some(r => r.day === day && r.time === time);
 }
-// Jadual tetap Cikgu ZZ sendiri (mingguan, bermula 5 Dis 2026, tanpa tarikh akhir).
-// Sama dengan tab Jadual_Tetap dalam Sheet. Kalau jadual berubah, kemas senarai ini juga.
-const JADUAL_TETAP = [
-  { day: 0, start: "17:00", end: "18:30" }, // Ahad    AddMath T4
-  { day: 1, start: "17:00", end: "18:15" }, // Isnin   Matematik T3
-  { day: 2, start: "20:00", end: "21:00" }, // Selasa  Matematik T1
-  { day: 2, start: "21:00", end: "22:00" }, // Selasa  Matematik T2
-  { day: 3, start: "17:00", end: "18:30" }, // Rabu    AddMath T5
-  { day: 4, start: "17:00", end: "18:15" }, // Khamis  Matematik T3
-  { day: 5, start: "20:00", end: "21:00" }, // Jumaat  Matematik T1
-  { day: 5, start: "21:00", end: "22:00" }  // Jumaat  Matematik T2
+// Jadual tetap Cikgu ZZ sendiri (mingguan, tanpa tarikh akhir). Dibaca dari tab "JadualTetap"
+// dalam Sheet awam (disalin dari tab Jadual_Tetap melalui app Rekod Pelajar). Senarai di bawah
+// hanya SANDARAN kalau tab itu tak dapat dibaca.
+let JADUAL_TETAP = [
+  { day: 0, start: "17:00", end: "18:30", from: "2026-12-05" },
+  { day: 1, start: "17:00", end: "18:15", from: "2026-12-05" },
+  { day: 2, start: "20:00", end: "21:00", from: "2026-12-05" },
+  { day: 2, start: "21:00", end: "22:00", from: "2026-12-05" },
+  { day: 3, start: "17:00", end: "18:30", from: "2026-12-05" },
+  { day: 4, start: "17:00", end: "18:15", from: "2026-12-05" },
+  { day: 5, start: "20:00", end: "21:00", from: "2026-12-05" },
+  { day: 5, start: "21:00", end: "22:00", from: "2026-12-05" }
 ];
-const JADUAL_TETAP_DARI = "2026-12-05";
+const TETAP_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=JadualTetap`;
+async function loadTetap(){
+  try{
+    const res = await fetch(TETAP_CSV_URL);
+    if(!res.ok) return;
+    const rows = csvToObjects(await res.text());
+    // gviz beri tab pertama kalau nama tab tak wujud, jadi pastikan lajur betul ada.
+    if(!rows.length){ return; }
+    if(!("Mula Tarikh" in rows[0]) || !("Hari" in rows[0])) return;
+    const HN = ["Ahad","Isnin","Selasa","Rabu","Khamis","Jumaat","Sabtu"];
+    JADUAL_TETAP = rows.map(r => ({ day: HN.indexOf((r.Hari||"").trim()), start: (r.Mula||"").trim(), end: (r.Tamat||"").trim(), from: (r["Mula Tarikh"]||"").trim() }))
+      .filter(t => t.day >= 0 && /^\d{1,2}:\d{2}$/.test(t.start) && /^\d{1,2}:\d{2}$/.test(t.end) && /^\d{4}-\d{2}-\d{2}$/.test(t.from));
+  }catch(e){ console.warn("Jadual tetap: guna sandaran", e); }
+}
 function hhmmToMin(t){ const [h,m] = t.split(':').map(Number); return h*60 + m; }
 function isTetapBlocked(dateStr, time){
   const r = SLOT_TIME_RANGES[time];
-  if(!r || !dateStr || dateStr < JADUAL_TETAP_DARI) return false;
+  if(!r || !dateStr) return false;
   const day = dayOfWeek(dateStr), a = hhmmToMin(r.start), b = hhmmToMin(r.end);
-  return JADUAL_TETAP.some(t => t.day === day && hhmmToMin(t.start) < b && hhmmToMin(t.end) > a);
+  return JADUAL_TETAP.some(t => dateStr >= t.from && t.day === day && hhmmToMin(t.start) < b && hhmmToMin(t.end) > a);
 }
 function isOneOffTaken(dateStr, time){
   return isTetapBlocked(dateStr, time) || availability.oneOffOccupied.some(o => o.date === dateStr && o.time === time);
@@ -1054,7 +1068,7 @@ function renderTestimoni(){
 /* ---------- INIT ---------- */
 (async function init(){
   renderTestimoni();
-  await loadAvailability();
+  await Promise.all([loadAvailability(), loadTetap()]);
   buildPakejDayChips();
   updateSubjekAvailability();
 })();
