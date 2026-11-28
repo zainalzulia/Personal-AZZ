@@ -356,8 +356,8 @@ const CUTI_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq
 
 // 3) Jadual slot mengikut hari (0=Ahad, 1=Isnin ... 6=Sabtu).
 //    Setiap slot = 1 Jam 30 Minit.
-const SLOT_SCHEDULE = {
-  0: ["2:00 - 3:30 PM", "5:00 - 6:30 PM", "8:30 - 10:00 PM"],             // Ahad
+let SLOT_SCHEDULE = {
+  0: ["2:00 - 3:30 PM", "5:00 - 6:30 PM", "8:30 - 10:00 PM"],             // Ahad (sandaran sahaja)
   1: ["9:00 - 10:30 AM", "2:00 - 3:30 PM", "5:00 - 6:30 PM", "8:30 - 10:00 PM"],  // Isnin
   2: ["9:00 - 10:30 AM", "2:00 - 3:30 PM", "5:00 - 6:30 PM", "8:30 - 10:00 PM"],  // Selasa
   3: ["9:00 - 10:30 AM", "2:00 - 3:30 PM", "5:00 - 6:30 PM", "8:30 - 10:00 PM"],  // Rabu
@@ -365,6 +365,31 @@ const SLOT_SCHEDULE = {
   5: ["9:00 - 10:30 AM", "2:00 - 3:30 PM", "5:00 - 6:30 PM", "8:30 - 10:00 PM"],  // Jumaat
   6: ["9:00 - 10:30 AM", "8:30 - 10:00 PM"],                              // Sabtu
 };
+// Slot yang dipaparkan sebenarnya dibaca dari tab "SlotBorang" (salinan tab Slot_Borang dalam app, melalui IMPORTRANGE).
+// Senarai di atas hanya SANDARAN kalau tab itu tak dapat dibaca.
+const SLOTB_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=SlotBorang`;
+async function loadSlotB(){
+  try{
+    const res = await fetch(SLOTB_CSV_URL);
+    if(!res.ok) return;
+    const rows = csvToObjects(await res.text());
+    // gviz beri tab pertama kalau nama tab tak wujud: pastikan lajur betul ada.
+    if(!rows.length || !("Papar" in rows[0]) || !("Masa" in rows[0]) || !("Hari" in rows[0])) return;
+    const HN = ["Ahad","Isnin","Selasa","Rabu","Khamis","Jumaat","Sabtu"];
+    const ORDER = ["9:00 - 10:30 AM","2:00 - 3:30 PM","5:00 - 6:30 PM","8:30 - 10:00 PM"];
+    const sched = {0:[],1:[],2:[],3:[],4:[],5:[],6:[]};
+    let n = 0;
+    rows.forEach(r => {
+      const d = HN.indexOf((r.Hari||"").trim()), m = (r.Masa||"").trim();
+      if(d < 0 || ORDER.indexOf(m) < 0) return;
+      n++;
+      if((r.Papar||"").trim().toLowerCase() === "ya") sched[d].push(m);
+    });
+    if(n < 7) return;
+    Object.keys(sched).forEach(d => sched[d].sort((a,b) => ORDER.indexOf(a) - ORDER.indexOf(b)));
+    SLOT_SCHEDULE = sched;
+  }catch(e){ console.warn("Slot borang: guna sandaran", e); }
+}
 const DAY_NAMES = ["Ahad","Isnin","Selasa","Rabu","Khamis","Jumaat","Sabtu"];
 const DAYS_AHEAD_LIMIT = 90; // ~3 bulan ke depan (dulu 21 hari — terlalu pendek)
 const MIN_LEAD_DAYS = 3; // tempahan tak boleh dibuat kurang dari 3 hari sebelum kelas
@@ -1068,7 +1093,7 @@ function renderTestimoni(){
 /* ---------- INIT ---------- */
 (async function init(){
   renderTestimoni();
-  await Promise.all([loadAvailability(), loadTetap()]);
+  await Promise.all([loadAvailability(), loadTetap(), loadSlotB()]);
   buildPakejDayChips();
   updateSubjekAvailability();
 })();
